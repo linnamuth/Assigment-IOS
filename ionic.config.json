@@ -1,0 +1,7 @@
+{
+  "name": "MyLoanApp",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}
