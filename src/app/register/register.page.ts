@@ -27,56 +27,70 @@ export class RegisterPage {
   ) {}
 
   async onRegister() {
-  // ... (validation code remains the same) ...
-
-  const loading = await this.loadingCtrl.create({
-    message: 'Registering...'
-  });
-  await loading.present();
-
-  try {
-    const newUser = {
-      id: Date.now(),
-      username: this.username.trim(),
-      email: this.email.toLowerCase().trim(),
-      password: this.password, // Note: In a real app, never store plain text passwords!
-      joinedDate: new Date().toISOString(),
-      balance: 0,
-      completedVideoIds: [],
-      loanHistory: []
-    };
-
-    // 1. USE LOCALSTORAGE for the 'Database' so it survives a browser close
-    const storedUsers = localStorage.getItem('all_users_list');
-    let usersArray = storedUsers ? JSON.parse(storedUsers) : [];
-
-    // 2. Check if user exists
-    const userExists = usersArray.some((u: any) => u.email === newUser.email);
-    if (userExists) {
-      await loading.dismiss();
-      this.presentToast('Email already registered', 'danger');
+    if (!this.username.trim() || !this.email.trim() || !this.password.trim()) {
+      this.presentToast('Please fill in all fields', 'warning');
       return;
     }
 
-    // 3. Save to Permanent User List
-    usersArray.push(newUser);
-    localStorage.setItem('all_users_list', JSON.stringify(usersArray));
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.email)) {
+      this.presentToast('Please enter a valid email address', 'warning');
+      return;
+    }
 
-    // 4. USE SESSIONSTORAGE for the Active Login (security)
-    sessionStorage.setItem('user', JSON.stringify(newUser));
+    const loading = await this.loadingCtrl.create({
+      message: 'Creating temporary account...',
+      mode: 'ios'
+    });
+    await loading.present();
 
-    // 5. Update Auth Service
-    this.auth.setUser(newUser);
+    try {
+      const newUser = {
+        id: Date.now(),
+        username: this.username.trim(),
+        email: this.email.toLowerCase().trim(),
+        password: this.password,
+        joinedDate: new Date().toISOString(),
+        profilePic: null,
+        balance: 0,
+        currentLoan: null,
+        repaymentSchedule: [],
+        loanHistory: []
+      };
 
-    await loading.dismiss();
-    this.router.navigate(['/tabs/home'], { replaceUrl: true });
-    this.presentToast('Registration successful!', 'success');
+      await Haptics.impact({ style: ImpactStyle.Medium });
 
-  } catch (error) {
-    await loading.dismiss();
-    this.presentToast('Storage error.', 'danger');
+      const storedUsers = sessionStorage.getItem('all_users_list');
+      let usersArray = storedUsers ? JSON.parse(storedUsers) : [];
+
+      const userExists = usersArray.some((u: any) => u.email === newUser.email);
+      if (userExists) {
+        loading.dismiss();
+        this.presentToast('Email already exists in this session', 'danger');
+        return;
+      }
+
+      usersArray.push(newUser);
+      sessionStorage.setItem('all_users_list', JSON.stringify(usersArray));
+
+      sessionStorage.setItem('user', JSON.stringify(newUser));
+
+      this.auth.register(newUser);
+
+      loading.dismiss();
+
+      // 7. NAVIGATE
+      setTimeout(() => {
+        this.router.navigate(['/tabs/home'], { replaceUrl: true });
+        this.presentToast('Registration successful!', 'success');
+      }, 300);
+
+    } catch (error) {
+      loading.dismiss();
+      console.error('Registration Error:', error);
+      this.presentToast('Session storage error.', 'danger');
+    }
   }
-}
 
   async presentToast(message: string, color: string = 'dark') {
     const toast = await this.toastCtrl.create({
