@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { IonicModule, NavController } from '@ionic/angular';
 import { Router } from '@angular/router';
 
 @Component({
@@ -23,48 +23,63 @@ export class ApplicationStatusPage implements OnInit {
   loanCollateral: string = '';
   includeExtraFees: boolean = false;
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private navCtrl: NavController) {}
 
   ngOnInit() {
-    // 1. Try to get state from navigation
+    // 1. Try to get state from the immediate router navigation
     const navState = this.router.getCurrentNavigation()?.extras.state as any;
 
     if (navState?.application) {
       this.setApplication(navState.application);
     } else {
-      // 2. If page is refreshed, try to load from localStorage
-      const savedApp = localStorage.getItem('currentApplication');
+      // 2. FALLBACK: Try to load from sessionStorage (handles Page Refresh)
+      const savedApp = sessionStorage.getItem('currentApplication');
+
       if (savedApp) {
         this.setApplication(JSON.parse(savedApp));
       } else {
-        // 3. If no data, redirect back to form
-        this.router.navigate(['/tabs/upload-document']);
+        // 3. SECONDARY FALLBACK: Check inside the active user object
+        const userData = sessionStorage.getItem('user');
+        const user = userData ? JSON.parse(userData) : null;
+
+        if (user && user.currentApplication) {
+          this.setApplication(user.currentApplication);
+        } else {
+          // 4. If absolutely no data, go back to start
+          console.warn('No application found in session. Redirecting...');
+          this.navCtrl.navigateRoot('/tabs/home');
+        }
       }
     }
   }
 
   private setApplication(app: any) {
-    this.applicationId = app.id;
+    // Basic fields
+    this.applicationId = app.id || app.applicationId;
     this.submissionDate = app.submissionDate;
     this.reviewTime = app.reviewTime;
-    this.applicantName = app.fullName;
+    this.applicantName = app.fullName || (app.personalInfo ? app.personalInfo.fullName : '');
 
-    // Assign loan fields correctly
-    this.loanAmount = app.loan?.amount || 0;
-    this.loanInterest = app.loan?.interest || 0;
-    this.loanDuration = app.loan?.duration || 0;
-    this.loanCollateral = app.loan?.collateral || '';
-    this.includeExtraFees = app.loan?.includeExtraFees || false;
+    // Loan fields (nested inside app.loan or app.loanDetails)
+    const loan = app.loan || app.loanDetails;
 
-    // Save to localStorage so page reload keeps data
-    localStorage.setItem('currentApplication', JSON.stringify(app));
+    this.loanAmount = loan?.amount || 0;
+    this.loanInterest = loan?.interest || 0;
+    this.loanDuration = loan?.duration || 0;
+    this.loanCollateral = loan?.collateral || '';
+    this.includeExtraFees = loan?.includeExtraFees || false;
+
+    // Persist to sessionStorage so it survives a browser refresh
+    sessionStorage.setItem('currentApplication', JSON.stringify(app));
   }
 
   goToDashboard() {
-    this.router.navigate(['/dashboard']);
+    this.navCtrl.navigateRoot('/tabs/home');
   }
 
   viewApplicationDetail() {
-    this.router.navigate(['/application-detail'], { state: { applicationId: this.applicationId } });
+    this.router.navigate(['/application-detail'], {
+      state: { applicationId: this.applicationId }
+    });
   }
 }

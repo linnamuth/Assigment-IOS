@@ -8,7 +8,7 @@ import {
   ToastController,
   LoadingController
 } from '@ionic/angular';
-import { AuthService } from '../services/auth.service'; // Ensure this path is correct
+import { AuthService } from '../services/auth.service';
 import { VideoModalComponent } from '../video-modal/video-modal.component';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 
@@ -31,11 +31,9 @@ interface VideoTask {
   imports: [CommonModule, FormsModule, IonicModule]
 })
 export class AdvisorPage implements OnInit {
-  // Referral Properties
   public refLink: string = 'https://yourapp.com/ref/guest';
   private readonly SHARE_TEXT = 'Join Play Advisor and start earning rewards for watching videos!';
 
-  // User States
   userBalance: number = 0;
   referralCollected: boolean = false;
   isLoading: boolean = true;
@@ -46,7 +44,7 @@ export class AdvisorPage implements OnInit {
     private actionSheetCtrl: ActionSheetController,
     private toastCtrl: ToastController,
     private loadingCtrl: LoadingController,
-    private auth: AuthService // Injected to manage user-specific data
+    private auth: AuthService
   ) {}
 
   ngOnInit() {
@@ -54,29 +52,26 @@ export class AdvisorPage implements OnInit {
   }
 
   /**
-   * 1. INITIALIZE PAGE BASED ON LOGGED-IN USER
+   * 1. INITIALIZE PAGE BASED ON SESSION DATA
    */
   async initUserPage() {
-    const userData = localStorage.getItem('user');
+    // CHANGED: Reading from sessionStorage
+    const userData = sessionStorage.getItem('user');
+
     if (userData) {
       const user = JSON.parse(userData);
 
-      // Set local variables from the user object
       this.userBalance = user.balance || 0;
       this.referralCollected = user.referralClaimed || false;
       this.refLink = `https://yourapp.com/ref/${user.username || 'user'}`;
 
-      // Load tasks and mark which ones this specific user has finished
+      // Load tasks and sync with the user's session-based progress
       await this.loadDynamicData(user.completedVideoIds || []);
     } else {
-      // Fallback if no user found
       this.isLoading = false;
     }
   }
 
-  /**
-   * 2. LOAD TASKS & SYNC WITH USER PROGRESS
-   */
   async loadDynamicData(completedIds: number[], event?: any) {
     this.isLoading = true;
 
@@ -105,7 +100,6 @@ export class AdvisorPage implements OnInit {
         }
       ];
 
-      // Map tasks to check if THIS user has already collected them
       this.videoTasks = availableTasks.map(task => ({
         ...task,
         collected: completedIds.includes(task.id)
@@ -117,17 +111,19 @@ export class AdvisorPage implements OnInit {
   }
 
   /**
-   * 3. UPDATE USER DATA IN LOCAL STORAGE AND AUTH SERVICE
+   * 2. PERSIST REWARDS TO SESSION STORAGE
    */
   private async persistUserReward(amount: number, videoId?: number) {
-    const userData = localStorage.getItem('user');
+    // CHANGED: Reading from sessionStorage
+    const userData = sessionStorage.getItem('user');
+
     if (userData) {
       const user = JSON.parse(userData);
 
       // Update Balance
-      user.balance = (user.balance || 0) + amount;
+      user.balance = Number(((user.balance || 0) + amount).toFixed(2));
 
-      // If it was a video, add to their unique completed list
+      // Update Video Progress
       if (videoId) {
         if (!user.completedVideoIds) user.completedVideoIds = [];
         if (!user.completedVideoIds.includes(videoId)) {
@@ -135,24 +131,37 @@ export class AdvisorPage implements OnInit {
         }
       }
 
-      // If it was a referral reward
+      // Update Referral Status
       if (amount === 1.0) {
         user.referralClaimed = true;
       }
 
-      // Save to LocalStorage permanently
-      localStorage.setItem('user', JSON.stringify(user));
+      // Save updated user to current session
+      sessionStorage.setItem('user', JSON.stringify(user));
 
-      // Update local UI variables
+      // NEW: Sync with global session user list to maintain data across the app session
+      this.syncWithGlobalSession(user);
+
+      // Update local UI and Auth Service
       this.userBalance = user.balance;
-
-      // Update AuthService so Home/Profile pages see the new balance
       this.auth.setUser(user);
     }
   }
 
+  private syncWithGlobalSession(updatedUser: any) {
+    const allUsersJson = sessionStorage.getItem('all_users_list');
+    if (allUsersJson) {
+      let users = JSON.parse(allUsersJson);
+      const index = users.findIndex((u: any) => u.email === updatedUser.email);
+      if (index !== -1) {
+        users[index] = updatedUser;
+        sessionStorage.setItem('all_users_list', JSON.stringify(users));
+      }
+    }
+  }
+
   /**
-   * 4. VIDEO LOGIC
+   * 3. VIDEO & REFERRAL LOGIC
    */
   async playVideo(video: VideoTask) {
     if (video.collected) {
@@ -168,7 +177,8 @@ export class AdvisorPage implements OnInit {
         reward: video.reward,
         requiredSeconds: 10
       },
-      cssClass: 'glass-modal'
+      cssClass: 'glass-modal',
+      mode: 'ios'
     });
 
     await modal.present();
@@ -181,9 +191,6 @@ export class AdvisorPage implements OnInit {
     }
   }
 
-  /**
-   * 5. REFERRAL LOGIC
-   */
   async shareReferral() {
     if (this.referralCollected) {
       this.presentToast('Referral reward already claimed!', 'dark');
@@ -195,6 +202,7 @@ export class AdvisorPage implements OnInit {
     const actionSheet = await this.actionSheetCtrl.create({
       header: 'EXPAND YOUR NETWORK',
       subHeader: 'Share to claim your $1.00 bonus',
+      mode: 'ios',
       buttons: [
         {
           text: 'Telegram',
@@ -216,7 +224,8 @@ export class AdvisorPage implements OnInit {
     const loading = await this.loadingCtrl.create({
       message: 'Verifying Share...',
       duration: 1000,
-      spinner: 'crescent'
+      spinner: 'crescent',
+      mode: 'ios'
     });
     await loading.present();
 
@@ -231,7 +240,6 @@ export class AdvisorPage implements OnInit {
     }, 1100);
   }
 
-  // Helper Methods
   private openTelegram() {
     const url = `https://t.me/share/url?url=${encodeURIComponent(this.refLink)}&text=${encodeURIComponent(this.SHARE_TEXT)}`;
     window.open(url, '_system');
@@ -252,4 +260,4 @@ export class AdvisorPage implements OnInit {
     });
     await toast.present();
   }
-} 
+}

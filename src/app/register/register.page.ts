@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 import { Haptics, ImpactStyle } from '@capacitor/haptics';
-import { IonicModule, ToastController } from '@ionic/angular';
+import { IonicModule, ToastController, LoadingController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -17,60 +17,98 @@ export class RegisterPage {
   username: string = '';
   email: string = '';
   password: string = '';
-  showPassword = false; // Toggle for password visibility
+  showPassword = false;
 
   constructor(
     private auth: AuthService,
     private router: Router,
-    private toastCtrl: ToastController
+    private toastCtrl: ToastController,
+    private loadingCtrl: LoadingController
   ) {}
 
-async onRegister() {
-  // 1. Validation
-  if (!this.username || !this.email || !this.password) {
-    this.presentToast('Please complete all fields');
-    return;
-  }
-
-  try {
-    const userData = {
-      username: this.username.trim(),
-      email: this.email.toLowerCase().trim(),
-      password: this.password,
-      joinedDate: new Date().toISOString()
-    };
-
-    await Haptics.impact({ style: ImpactStyle.Heavy });
-
-    localStorage.setItem('user', JSON.stringify(userData));
-
-    this.auth.register(userData);
-
-    const navSuccess = await this.router.navigate(['/tabs/home']);
-
-    if (navSuccess) {
-      this.presentToast('Account created successfully!');
-    } else {
-      console.error('Navigation failed to /tabs/home');
-      this.router.navigateByUrl('/tabs');
+  async onRegister() {
+    if (!this.username.trim() || !this.email.trim() || !this.password.trim()) {
+      this.presentToast('Please fill in all fields', 'warning');
+      return;
     }
 
-  } catch (error) {
-    console.error('Registration Error:', error);
-    this.presentToast('Error saving account info');
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(this.email)) {
+      this.presentToast('Please enter a valid email address', 'warning');
+      return;
+    }
+
+    const loading = await this.loadingCtrl.create({
+      message: 'Creating temporary account...',
+      mode: 'ios'
+    });
+    await loading.present();
+
+    try {
+      const newUser = {
+        id: Date.now(),
+        username: this.username.trim(),
+        email: this.email.toLowerCase().trim(),
+        password: this.password,
+        joinedDate: new Date().toISOString(),
+        profilePic: null,
+        balance: 0,
+        currentLoan: null,
+        repaymentSchedule: [],
+        loanHistory: []
+      };
+
+      await Haptics.impact({ style: ImpactStyle.Medium });
+
+      // 3. DATABASE LOGIC: Using sessionStorage instead of localStorage
+      const storedUsers = sessionStorage.getItem('all_users_list');
+      let usersArray = storedUsers ? JSON.parse(storedUsers) : [];
+
+      // 4. CHECK IF EMAIL EXISTS IN THIS SESSION
+      const userExists = usersArray.some((u: any) => u.email === newUser.email);
+      if (userExists) {
+        loading.dismiss();
+        this.presentToast('Email already exists in this session', 'danger');
+        return;
+      }
+
+      // 5. SAVE TO GLOBAL LIST (SESSION ONLY)
+      usersArray.push(newUser);
+      sessionStorage.setItem('all_users_list', JSON.stringify(usersArray));
+
+      // 6. SET CURRENT SESSION
+      sessionStorage.setItem('user', JSON.stringify(newUser));
+
+      // Update AuthService state
+      this.auth.register(newUser);
+
+      loading.dismiss();
+
+      // 7. NAVIGATE
+      setTimeout(() => {
+        this.router.navigate(['/tabs/home'], { replaceUrl: true });
+        this.presentToast('Registration successful!', 'success');
+      }, 300);
+
+    } catch (error) {
+      loading.dismiss();
+      console.error('Registration Error:', error);
+      this.presentToast('Session storage error.', 'danger');
+    }
   }
-}
-  async presentToast(message: string) {
+
+  async presentToast(message: string, color: string = 'dark') {
     const toast = await this.toastCtrl.create({
       message,
-      duration: 2000,
-      position: 'top',
+      duration: 2500,
+      position: 'bottom',
       mode: 'ios',
-      color: 'dark'
+      color: color
     });
-    toast.present();
+    await toast.present();
   }
+
   goToLogin() {
-  this.router.navigate(['/login']);
-}
+    this.router.navigate(['/login']);
+  }
 }

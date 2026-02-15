@@ -1,7 +1,10 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, ModalController } from '@ionic/angular';
+import {
+  IonicModule,
+  ModalController
+} from '@ionic/angular';
 import { addIcons } from 'ionicons';
 import {
   searchOutline, optionsOutline, chevronForwardOutline,
@@ -31,28 +34,27 @@ export class HistoryPage {
     });
   }
 
+  // Use ionViewWillEnter to refresh history every time user enters the tab
   ionViewWillEnter() {
     this.loadData();
   }
 
- loadData() {
-  // 1. Get the specific logged-in user
-  const userData = localStorage.getItem('user');
+  loadData() {
+    // UPDATED: Now reading from sessionStorage
+    const userData = sessionStorage.getItem('user');
 
-  if (userData) {
-    const user = JSON.parse(userData);
+    if (userData) {
+      const user = JSON.parse(userData);
 
-    // 2. Pull history from the USER object, not the global list
-    // We use an empty array [] as a fallback if the user has no history yet
-    this.allHistory = user.loanHistory || [];
+      // Pull history from the active user object
+      this.allHistory = user.loanHistory || [];
+      console.log('Viewing session history for:', user.username);
+    } else {
+      this.allHistory = [];
+    }
 
-    console.log('Loaded history for:', user.username);
-  } else {
-    this.allHistory = [];
+    this.applyFilters();
   }
-
-  this.applyFilters();
-}
 
   setFilter(filter: string) {
     this.selectedFilter = filter;
@@ -61,6 +63,8 @@ export class HistoryPage {
 
   applyFilters() {
     let filtered = [...this.allHistory];
+
+    // Search filtering
     if (this.searchText.trim() !== '') {
       const search = this.searchText.toLowerCase();
       filtered = filtered.filter(item =>
@@ -69,6 +73,7 @@ export class HistoryPage {
       );
     }
 
+    // Date filtering
     const now = Date.now();
     if (this.selectedFilter === 'Today') {
       const todayStr = new Date().toLocaleDateString();
@@ -78,6 +83,7 @@ export class HistoryPage {
       filtered = filtered.filter(item => item.timestamp >= sevenDaysAgo);
     }
 
+    // Sort: Newest first
     filtered.sort((a, b) => b.timestamp - a.timestamp);
     this.groupData(filtered);
   }
@@ -107,7 +113,8 @@ export class HistoryPage {
       breakpoints: [0, 0.5, 0.85],
       initialBreakpoint: 0.5,
       handle: true,
-      cssClass: 'custom-modal'
+      cssClass: 'custom-modal',
+      mode: 'ios' // Ensure consistent iOS look for the bottom sheet
     });
     return await modal.present();
   }
@@ -118,7 +125,7 @@ export class HistoryPage {
   }
 }
 
-/** --- POPUP DETAIL COMPONENT --- **/
+/** --- POPUP DETAIL COMPONENT (STAY CONTEXTUAL) --- **/
 @Component({
   selector: 'app-history-detail',
   standalone: true,

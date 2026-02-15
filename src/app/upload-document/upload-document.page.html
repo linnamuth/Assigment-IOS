@@ -56,47 +56,47 @@
     <h4 class="section-subtitle">Current Address</h4>
 
     <ion-item class="styled-input">
-  <ion-input type="text" [(ngModel)]="province" placeholder="province"></ion-input>
-</ion-item>
+      <ion-input type="text" [(ngModel)]="province" placeholder="province"></ion-input>
+    </ion-item>
 
-<ion-item class="styled-input">
-  <ion-input type="text" [(ngModel)]="district" placeholder="district"></ion-input>
-</ion-item>
+    <ion-item class="styled-input">
+      <ion-input type="text" [(ngModel)]="district" placeholder="district"></ion-input>
+    </ion-item>
 
-<ion-item class="styled-input">
-  <ion-input type="text" [(ngModel)]="commune" placeholder="commune"></ion-input>
-</ion-item>
+    <ion-item class="styled-input">
+      <ion-input type="text" [(ngModel)]="commune" placeholder="commune"></ion-input>
+    </ion-item>
 
 
 
   </div>
 
   <!-- Loan Info -->
- <div class="card form-section">
-  <h3 class="section-title">Loan Information</h3>
+  <div class="card form-section">
+    <h3 class="section-title">Loan Information</h3>
 
-  <ion-item>
-    <ion-label position="floating">Loan Type</ion-label>
-    <ion-select [(ngModel)]="loanType" interface="popover" (ionChange)="saveLoanData()">
-      <ion-select-option *ngFor="let type of loanTypes" [value]="type">{{ type }}</ion-select-option>
-    </ion-select>
-  </ion-item>
+    <ion-item>
+      <ion-label position="floating">Loan Type</ion-label>
+      <ion-select [(ngModel)]="loanType" interface="popover" (ionChange)="saveLoanData()">
+        <ion-select-option *ngFor="let type of loanTypes" [value]="type">{{ type }}</ion-select-option>
+      </ion-select>
+    </ion-item>
 
-  <ion-item>
-    <ion-label position="floating">Loan Amount</ion-label>
-    <ion-input type="number" [(ngModel)]="loanAmount" (ionChange)="saveLoanData()"></ion-input>
-  </ion-item>
+    <ion-item>
+      <ion-label position="floating">Loan Amount</ion-label>
+      <ion-input type="number" [(ngModel)]="loanAmount" (ionChange)="saveLoanData()"></ion-input>
+    </ion-item>
 
-  <ion-item>
-    <ion-label position="floating">Interest Rate (%)</ion-label>
-    <ion-input type="number" [(ngModel)]="interestRate" (ionChange)="saveLoanData()"></ion-input>
-  </ion-item>
+    <ion-item>
+      <ion-label position="floating">Interest Rate (%)</ion-label>
+      <ion-input type="number" [(ngModel)]="interestRate" (ionChange)="saveLoanData()"></ion-input>
+    </ion-item>
 
-  <ion-item>
-    <ion-label position="floating">Duration (Months)</ion-label>
-    <ion-input type="number" [(ngModel)]="durationMonths" (ionChange)="saveLoanData()"></ion-input>
-  </ion-item>
-</div>
+    <ion-item>
+      <ion-label position="floating">Duration (Months)</ion-label>
+      <ion-input type="number" [(ngModel)]="durationMonths" (ionChange)="saveLoanData()"></ion-input>
+    </ion-item>
+  </div>
 
 
   <!-- Submit Button -->

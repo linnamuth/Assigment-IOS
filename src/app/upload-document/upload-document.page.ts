@@ -68,7 +68,6 @@ export class UploadDocumentPage implements OnInit {
   firstName: string = '';
   lastName: string = '';
   email: string = '';
-  phoneNumber: string = '';
   placeOfBirth: string = '';
   currentAddress: string = '';
   address = {
@@ -77,15 +76,14 @@ export class UploadDocumentPage implements OnInit {
     commune: '',
     village: ''
   };
-  provinces = ['Phnom Penh', 'Siem Reap', 'Battambang'];
-  districts = ['Chamkar Mon', 'Prampir Meakkakra', 'Daun Penh'];
-  communes = ['Sangkat 1', 'Sangkat 2', 'Sangkat 3'];
+  provinces = '';
+  districts = '';
+  communes = '';
 
   province = '';
   district = '';
   commune = '';
 
-  // Dropdown options
   maritalStatuses: string[] = ['Single', 'Married', 'Divorced', 'Widowed'];
   occupations: string[] = ['Employee', 'Business Owner', 'Self-Employed', 'Unemployed', 'Student'];
   incomeSources: string[] = ['Salary', 'Business', 'Rental Income', 'Investments', 'Others'];
@@ -113,20 +111,7 @@ export class UploadDocumentPage implements OnInit {
   repaymentMethod: string = '';
   disbursementDate: string = '';
 
-  // ngModel bindings
 
-
-
-  // Loan info passed from previous page
-  // loan: LoanData = {
-  //   amount: 0,
-  //   interest: 0,
-  //   duration: 0,
-  //   collateral: '',
-  //   includeExtraFees: false
-  // };
-
-  // List of required documents
   documents: DocumentItem[] = [
     { id: 1, title: 'ID Card / Passport', description: 'Upload your official ID', icon: 'document-text-outline' },
     { id: 2, title: 'Income Proof', description: 'Payslip or bank statement', icon: 'document-text-outline' },
@@ -141,16 +126,34 @@ export class UploadDocumentPage implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.loadLoanFromSession();
+  }
 
+  loadLoanFromSession() {
+    const sessionData = sessionStorage.getItem('user');
 
-    const storedLoan = localStorage.getItem('loanData');
-    if (storedLoan) {
-      const loan = JSON.parse(storedLoan);
-      this.loanAmount = loan.amount;
-      this.interestRate = loan.interest;
-      this.durationMonths = loan.duration;
-      this.collateral = loan.collateral;
-      this.includeExtraFees = loan.includeExtraFees || false;
+    if (sessionData) {
+      const user = JSON.parse(sessionData);
+      if (user.currentLoan) {
+        const loan = user.currentLoan;
+
+        this.loanAmount = loan.amount || 0;
+        this.interestRate = loan.interest || 0;
+        this.durationMonths = loan.duration || 12;
+        this.collateral = loan.collateral || '';
+        this.includeExtraFees = loan.includeExtraFees || false;
+
+        console.log('Loan data loaded from session:', loan);
+      } else {
+        console.warn('No active loan calculation found in session.');
+      }
+
+      if (!this.firstName) this.firstName = user.username || '';
+      if (!this.email) this.email = user.email || '';
+
+    } else {
+      console.error('Session lost. Redirecting...');
+      this.router.navigate(['/tabs/home']);
     }
   }
 
@@ -169,97 +172,86 @@ export class UploadDocumentPage implements OnInit {
   }
 
   editLoan() {
-    // Navigate back to the previous page to edit loan details
     this.router.navigate(['/tabs/home']);
   }
-
-  // In your form page (e.g., upload-document.page.ts)
-async submitApplication() {
-
-  const loading = await this.loadingCtrl.create({
-    message: 'Processing...',
-    spinner: 'circles',
-    backdropDismiss: false
-  });
-
-  await loading.present();
-
-  try {
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    // ✅ Get loan from localStorage
-    const storedLoan = localStorage.getItem('loanData');
-
-    let loanData = {
-      amount: 0,
-      interest: 0,
-      duration: 0,
-      collateral: '',
-      includeExtraFees: false
-    };
-
-    if (storedLoan) {
-      loanData = JSON.parse(storedLoan);
-    }
-
-    // ✅ Build application object
-    const applicationData = {
-      id: '#LN-' + Math.floor(Math.random() * 1000000),
-      fullName: `${this.firstName} ${this.lastName}`,
-      email: this.email,
-      placeOfBirth: this.placeOfBirth,
-      maritalStatus: this.maritalStatus || '',
-      currentOccupation: this.currentOccupation || '',
-      sourceOfIncome: this.sourceOfIncome || '',
-      company: this.company || '',
-      address: {
-        province: this.province,
-        district: this.district,
-        commune: this.commune,
-        current: this.currentAddress || ''
-      },
-      loan: loanData,
-      submissionDate: new Date().toLocaleString(),
-      reviewTime: '24–48 Hours'
-    };
-
-    // ✅ Save to localStorage
-    localStorage.setItem('currentApplication', JSON.stringify(applicationData));
-
-    await loading.dismiss();
+  async submitApplication() {
+    // Basic Validation
 
 
-
-     this.router.navigate(
-            ['/tabs/application-status'],
-            { state: { application: applicationData } }
-          );
-
-  } catch (error) {
-
-    await loading.dismiss();
-
-    const errorAlert = await this.alertCtrl.create({
-      header: 'Error',
-      message: 'Failed to submit application. Please try again.',
-      buttons: ['OK']
+    const loading = await this.loadingCtrl.create({
+      message: 'Submitting to Session...',
+      spinner: 'circles',
+      mode: 'ios'
     });
+    await loading.present();
 
-    await errorAlert.present();
+    try {
+      const userData = sessionStorage.getItem('user');
+      if (!userData) throw new Error("No User Session");
+
+      const currentUser = JSON.parse(userData);
+      const applicationData = {
+        applicationId: '#LN-' + Math.floor(Math.random() * 1000000),
+        status: 'Under Review',
+        personalInfo: {
+          email: this.email,
+          address: `${this.currentAddress}, ${this.commune}, ${this.district}, ${this.province}`
+        },
+        loanDetails: currentUser.currentLoan, // Inherit from the calculation
+        submissionDate: new Date().toISOString(),
+        reviewTime: '24–48 Hours'
+      };
+
+      currentUser.currentApplication = applicationData;
+
+      sessionStorage.setItem('user', JSON.stringify(currentUser));
+      sessionStorage.setItem('currentApplication', JSON.stringify(applicationData));
+
+      const allUsers = JSON.parse(sessionStorage.getItem('all_users_list') || '[]');
+      const idx = allUsers.findIndex((u: any) => u.email === currentUser.email);
+      if (idx !== -1) {
+        allUsers[idx] = currentUser;
+        sessionStorage.setItem('all_users_list', JSON.stringify(allUsers));
+      }
+
+      await loading.dismiss();
+
+      // Navigate to status page
+      this.router.navigate(['/tabs/application-status']);
+
+    } catch (error) {
+      await loading.dismiss();
+      const errorAlert = await this.alertCtrl.create({
+        header: 'Submission Error',
+        message: 'Session lost. Please log in again.',
+        buttons: ['OK'],
+        mode: 'ios'
+      });
+      await errorAlert.present();
+    }
+  }
+
+
+
+
+ saveLoanData() {
+  const loanData = {
+    loanType: this.loanType,
+    amount: this.loanAmount,
+    interest: this.interestRate,
+    duration: this.durationMonths,
+    collateral: this.collateral // Good to include this too
+  };
+
+  const sessionUser = sessionStorage.getItem('user');
+
+  if (sessionUser) {
+    const user = JSON.parse(sessionUser);
+    user.currentLoan = loanData;
+    sessionStorage.setItem('user', JSON.stringify(user));
+  } else {
+    sessionStorage.setItem('loanData', JSON.stringify(loanData));
   }
 }
-
-
-
-
-saveLoanData() {
-    const loanData = {
-      loanType: this.loanType,
-      amount: this.loanAmount,
-      interest: this.interestRate,
-      duration: this.durationMonths
-    };
-    localStorage.setItem('loanData', JSON.stringify(loanData));
-  }
 
 }
