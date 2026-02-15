@@ -1,0 +1,61 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>My Profile</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="openEditProfile()">
+        <ion-icon slot="icon-only" name="cog-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="profile-content">
+  <div class="profile-container" *ngIf="user">
+
+    <div class="profile-header">
+      <div class="avatar-container">
+        <img *ngIf="user.profilePic; else defaultAvatar" [src]="user.profilePic" alt="avatar" class="profile-img">
+
+        <ng-template #defaultAvatar>
+          <img [src]="'https://ui-avatars.com/api/?name=' + user.username + '&background=0ea5e9&color=fff'"
+            alt="default avatar" class="profile-img">
+        </ng-template>
+
+        <div class="badge-pro">PRO</div>
+
+        <ion-button class="edit-btn" fill="clear" (click)="fileInput.click()">
+          <ion-icon name="camera-outline"></ion-icon>
+          <input #fileInput type="file" (change)="onFileSelected($event)" accept="image/*" style="display: none;" />
+        </ion-button>
+      </div>
+
+      <h2>@{{ user.username }}</h2>
+      <p>{{ user.email }}</p>
+
+    </div>
+
+    <div class="settings-list">
+      <ion-item lines="none" (click)="openEditProfile()" detail="false">
+        <div class="icon-box blue" slot="start">
+          <ion-icon name="person-outline"></ion-icon>
+        </div>
+        <ion-label>
+          <h3>Account Details</h3>
+          <p>Change username and email</p>
+        </ion-label>
+        <ion-icon name="chevron-forward-outline" slot="end" color="medium"></ion-icon>
+      </ion-item>
+    </div>
+
+    <div class="logout-container">
+      <ion-button expand="block" fill="flat" class="logout-btn" (click)="logout()">
+        <ion-icon slot="start" name="log-out-outline"></ion-icon>
+        Log Out
+      </ion-button>
+    </div>
+
+    <div class="version-text">
+      VERSION 2.0.26
+    </div>
+  </div>
+</ion-content>

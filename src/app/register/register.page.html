@@ -1,0 +1,54 @@
+<ion-content [fullscreen]="true" class="register-content">
+  <div class="bg-blur-circle primary"></div>
+  <div class="bg-blur-circle secondary"></div>
+
+  <div class="auth-container">
+    <div class="header-section">
+      <div class="logo-wrapper">
+        <div class="logo-inner">
+          <ion-icon name="shield-checkmark-sharp"></ion-icon>
+        </div>
+      </div>
+      <h1 class="main-title">Secure Register</h1>
+      <p class="subtitle">Set up your credentials to continue</p>
+    </div>
+
+    <div class="form-wrapper">
+      <div class="input-group">
+        <label>USERNAME</label>
+        <ion-item lines="none" class="custom-input">
+          <ion-icon name="at-outline" slot="start"></ion-icon>
+          <ion-input [(ngModel)]="username" type="text" placeholder="unique_id"></ion-input>
+        </ion-item>
+      </div>
+
+      <div class="input-group">
+        <label>EMAIL ADDRESS</label>
+        <ion-item lines="none" class="custom-input">
+          <ion-icon name="mail-outline" slot="start"></ion-icon>
+          <ion-input [(ngModel)]="email" type="email" placeholder="name@example.com"></ion-input>
+        </ion-item>
+      </div>
+
+      <div class="input-group">
+        <label>PASSWORD</label>
+        <ion-item lines="none" class="custom-input">
+          <ion-icon name="lock-closed-outline" slot="start"></ion-icon>
+          <ion-input [(ngModel)]="password" [type]="showPassword ? 'text' : 'password'" placeholder="••••••••"></ion-input>
+          <ion-button slot="end" fill="clear" color="medium" (click)="showPassword = !showPassword">
+            <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+          </ion-button>
+        </ion-item>
+      </div>
+
+      <ion-button expand="block" class="main-submit-btn" (click)="onRegister()">
+        Register Account
+        <ion-icon name="arrow-forward-outline" slot="end"></ion-icon>
+      </ion-button>
+    </div>
+
+    <div class="footer-actions">
+  <p>Already have an account? <span (click)="goToLogin()">Sign In</span></p>
+</div>
+  </div>
+</ion-content>

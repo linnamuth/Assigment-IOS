@@ -1,0 +1,138 @@
+.card {
+  background: #fff;
+  border-radius: 16px;
+  padding: 15px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.step-indicator {
+  text-align: left;
+  p {
+    font-size: 0.9rem;
+    color: gray;
+  }
+  .step-number {
+    text-align: right;
+    font-size: 0.8rem;
+    color: gray;
+  }
+}
+
+.form-section h3 {
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.section-title {
+  margin-top: 15px;
+  font-size: 0.95rem;
+  color: #555;
+  font-weight: 500;
+}
+
+.instructions {
+  margin: 20px 0;
+  color: #555;
+}
+
+.document-upload {
+  .document-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+
+    h3 {
+      margin: 0;
+      font-size: 1rem;
+    }
+    p {
+      margin: 0;
+      font-size: 0.85rem;
+      color: #666;
+    }
+  }
+
+  .file-name {
+    font-size: 0.85rem;
+    color: #007bff;
+    margin-top: 5px;
+  }
+}
+
+.loan-terms {
+  .loan-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+  }
+
+  .loan-details p {
+    margin: 5px 0;
+    font-size: 0.9rem;
+  }
+}
+
+/* Remove dropdown arrow icon */
+ion-select::part(icon) {
+  display: none;
+}
+
+/* Make select look like real input */
+.styled-select {
+  --background: #f8f9fb;
+  --border-radius: 12px;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+}
+
+/* Input styling */
+.styled-input {
+  --background: #f8f9fb;
+  --border-radius: 12px;
+  margin-bottom: 14px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
+}
+
+/* Label color */
+ion-label {
+  color: #6b7280;
+  font-weight: 500;
+}
+
+/* Selected text color */
+ion-select {
+  color: #111827;
+}
+
+
+.note {
+  font-size: 0.75rem;
+  color: gray;
+  margin-top: 10px;
+}
+.styled-date {
+  --highlight-background: #f0f8ff;   // light background for date input
+  --ion-color-primary: #3880ff;      // matches toolbar primary color
+  --padding-start: 10px;
+  --padding-end: 10px;
+  border-radius: 10px;
+  margin-bottom: 15px;
+  background: #f9f9f9;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+
+  ion-datetime {
+    width: 100%;
+    font-size: 16px;
+    --color: #222; // text color
+  }
+
+  ion-label {
+    font-weight: 600;
+    color: #555;
+  }
+}

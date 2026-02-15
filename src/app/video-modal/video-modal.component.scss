@@ -1,0 +1,35 @@
+:host {
+  .modal-wrapper {
+    border-radius: 0 !important;
+    height: 100%;
+    max-height: 100%;
+  }
+
+  video {
+    border-radius: 12px;
+    margin-bottom: 15px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  .collect-btn {
+    margin-top: 10px;
+    font-weight: 600;
+    --border-radius: 12px;
+    height: 50px;
+  }
+
+  /* Custom loading style */
+  .custom-loading {
+    --spinner-color: #ffffff;
+    --background: #0066ff;
+    color: white;
+    font-weight: bold;
+  }
+
+  /* Reward toast styling */
+  .reward-toast {
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-align: center;
+  }
+}

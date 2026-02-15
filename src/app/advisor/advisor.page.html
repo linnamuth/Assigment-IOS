@@ -1,0 +1,89 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar>
+    <ion-title>Play Advisor</ion-title>
+    <ion-buttons slot="end">
+      <ion-badge color="primary" mode="ios" class="balance-badge">
+        Wallet: {{ userBalance | currency:'USD':'symbol':'1.2-2' }}
+      </ion-badge>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="advisor-content">
+  <ion-refresher slot="fixed" (ionRefresh)="initUserPage()">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="container ion-padding">
+
+    <div class="referral-card" [class.claimed]="referralCollected">
+      <div class="card-header">
+        <ion-icon name="people-circle-outline" color="primary"></ion-icon>
+        <h2>Network Bonus</h2>
+      </div>
+      <p>Invite friends to join Play Advisor and earn a <b>$1.00</b> reward instantly.</p>
+
+      <div class="link-box">
+        <code>{{ refLink }}</code>
+      </div>
+
+      <ion-button expand="block"
+                  [color]="referralCollected ? 'success' : 'primary'"
+                  (click)="shareReferral()"
+                  mode="ios">
+        <ion-icon slot="start" [name]="referralCollected ? 'checkmark-done' : 'share-social-outline'"></ion-icon>
+        {{ referralCollected ? 'Bonus Collected' : 'Share & Earn $1.00' }}
+      </ion-button>
+    </div>
+
+    <div class="section-title">
+      <h3>Available Tasks</h3>
+      <p>Watch and earn based on your profile activity</p>
+    </div>
+
+    <div *ngIf="isLoading">
+      <div *ngFor="let i of [1,2,3]" class="task-card-skeleton">
+        <ion-skeleton-text animated style="width: 100%; height: 180px; border-radius: 16px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 60%; margin-top: 10px;"></ion-skeleton-text>
+        <ion-skeleton-text animated style="width: 40%;"></ion-skeleton-text>
+      </div>
+    </div>
+
+    <div *ngIf="!isLoading">
+      <div *ngFor="let video of videoTasks" class="task-card" [class.collected]="video.collected">
+
+        <div class="thumbnail-wrapper" (click)="playVideo(video)">
+          <img [src]="video.image" alt="Video thumbnail" />
+          <div class="play-overlay">
+            <ion-icon [name]="video.collected ? 'checkmark-circle' : 'play'"></ion-icon>
+          </div>
+          <div class="reward-tag">${{ video.reward }}</div>
+        </div>
+
+        <div class="task-info">
+          <div class="text-content">
+            <h4>{{ video.title }}</h4>
+            <p>{{ video.description }}</p>
+          </div>
+          <div class="duration-badge">
+            <ion-icon name="time-outline"></ion-icon>
+            {{ video.duration }}
+          </div>
+        </div>
+
+        <ion-button fill="clear"
+                    expand="block"
+                    [disabled]="video.collected"
+                    (click)="playVideo(video)">
+          {{ video.collected ? 'Reward Claimed' : 'Start Task' }}
+        </ion-button>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="!isLoading && videoTasks.length === 0">
+      <ion-icon name="videocam-off-outline"></ion-icon>
+      <p>No new tasks available for your account today.</p>
+    </div>
+
+  </div>
+</ion-content>

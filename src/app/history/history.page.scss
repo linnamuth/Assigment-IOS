@@ -1,0 +1,201 @@
+// Variables
+$primary: #3880ff;
+$bg-color: #f8fafc;
+$text-dark: #1e293b;
+$text-muted: #64748b;
+$success: #2ecc71;
+$white: #ffffff;
+
+ion-content {
+  --background: #{$bg-color};
+}
+
+// 1. Modern Search Section
+.search-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+
+  .search-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background: $white;
+    border-radius: 14px;
+    padding: 10px 16px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    border: 1px solid #e2e8f0;
+
+    ion-icon {
+      font-size: 20px;
+      color: $text-muted;
+      margin-right: 12px;
+    }
+
+    input {
+      border: none;
+      background: transparent;
+      width: 100%;
+      outline: none;
+      font-size: 15px;
+      color: $text-dark;
+
+      &::placeholder {
+        color: #94a3b8;
+      }
+    }
+  }
+
+  .filter-btn {
+    background: $primary;
+    color: $white;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    font-size: 22px;
+    box-shadow: 0 4px 12px rgba(56, 128, 255, 0.25);
+    cursor: pointer;
+    transition: transform 0.2s active;
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+}
+
+// 2. Filter Chips Container
+.filter-scroll {
+  display: flex;
+  overflow-x: auto;
+  gap: 10px;
+  margin-bottom: 24px;
+  padding-bottom: 4px;
+  scrollbar-width: none; // Hide for Firefox
+
+  &::-webkit-scrollbar {
+    display: none; // Hide for Chrome/Safari
+  }
+
+  .chip {
+    white-space: nowrap;
+    padding: 8px 22px;
+    background: #edf2f7;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: $text-muted;
+    transition: all 0.3s ease;
+    cursor: pointer;
+
+    &.active {
+      background: $primary;
+      color: $white;
+      box-shadow: 0 4px 10px rgba(56, 128, 255, 0.2);
+    }
+  }
+}
+
+// 3. Date Groups
+.group-container {
+  margin-bottom: 24px;
+
+  .group-title {
+    font-size: 12px;
+    font-weight: 800;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-bottom: 12px;
+    padding-left: 4px;
+  }
+}
+
+// 4. History Cards
+.loan-card {
+  background: $white;
+  border-radius: 18px;
+  padding: 18px;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  transition: transform 0.2s ease;
+
+  &:active {
+    transform: scale(0.98);
+    background: #fafafa;
+  }
+
+  .card-info {
+    .amount {
+      display: block;
+      font-size: 19px;
+      font-weight: 800;
+      color: $text-dark;
+      margin-bottom: 6px;
+    }
+
+    .details {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: $text-muted;
+      font-weight: 500;
+
+      .dot {
+        width: 4px;
+        height: 4px;
+        background: #cbd5e1;
+        border-radius: 50%;
+      }
+    }
+  }
+
+  .card-right {
+    text-align: right;
+
+    .time {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      color: #94a3b8;
+      margin-bottom: 6px;
+    }
+
+    ion-icon {
+      color: #cbd5e1;
+      font-size: 20px;
+    }
+  }
+}
+
+// 5. Empty State
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+
+  ion-icon {
+    font-size: 70px;
+    color: #e2e8f0;
+    margin-bottom: 16px;
+  }
+
+  p {
+    font-size: 16px;
+    color: $text-muted;
+    font-weight: 500;
+    max-width: 200px;
+    line-height: 1.5;
+  }
+}

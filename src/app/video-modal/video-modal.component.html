@@ -1,0 +1,52 @@
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-title>{{ title }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="closeModal()">Close</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="video-container">
+    <video
+      #videoPlayer
+      width="100%"
+      controls
+      autoplay
+      [src]="videoUrl"
+      (loadedmetadata)="onMetadataLoaded($event)"
+      (timeupdate)="onTimeUpdate($event)"
+      controlsList="nodownload"
+    ></video>
+  </div>
+
+  <div class="progress-card ion-margin-top">
+    <div class="timer-row">
+      <ion-icon [name]="canCollect ? 'checkmark-circle' : 'time-outline'"
+                [color]="canCollect ? 'success' : 'warning'">
+      </ion-icon>
+      <span class="timer-text">{{ displayTime }}</span>
+    </div>
+
+    <ion-progress-bar
+      [value]="watchProgress"
+      [color]="canCollect ? 'success' : 'primary'">
+    </ion-progress-bar>
+
+    <p class="status-msg" [class.ready]="canCollect">
+      {{ canCollect ? 'Reward unlocked! You can collect now.' : 'Watch 1 minute to unlock reward.' }}
+    </p>
+  </div>
+
+  <ion-button
+    expand="block"
+    color="success"
+    class="collect-btn ion-margin-top"
+    [disabled]="!canCollect || isProcessing"
+    (click)="collectReward()">
+    <ion-icon name="cash-outline" slot="start"></ion-icon>
+    Collect ${{ reward }}
+  </ion-button>
+
+</ion-content>

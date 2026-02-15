@@ -1,0 +1,65 @@
+<ion-content class="status-page">
+  <h2 class="title">Application Status</h2>
+
+  <div class="success-icon">
+    <ion-icon name="checkmark"></ion-icon>
+  </div>
+
+  <h1 class="success-text">Application Submitted!</h1>
+  <p class="description">
+    Your loan application has been successfully received and is now being processed.
+  </p>
+
+  <ion-card class="summary-card">
+    <ion-card-content>
+      <div class="row">
+        <span>Application ID</span>
+        <strong>{{ applicationId }}</strong>
+      </div>
+
+      <div class="row">
+        <span>Submission Date</span>
+        <strong>{{ submissionDate }}</strong>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="row">
+        <span>Estimated Review Time</span>
+        <strong class="highlight">{{ reviewTime }}</strong>
+      </div>
+
+      <div class="row">
+        <span>Applicant Name</span>
+        <strong>{{ applicantName }}</strong>
+      </div>
+
+      <div class="row">
+        <span>Loan Amount</span>
+        <strong>{{ loanAmount | currency:'USD' }}</strong>
+      </div>
+
+      <div class="row">
+        <span>Interest Rate</span>
+        <strong>{{ loanInterest }}%</strong>
+      </div>
+
+      <div class="row">
+        <span>Duration</span>
+        <strong>{{ loanDuration }} Months</strong>
+      </div>
+
+      <div class="row" *ngIf="loanCollateral">
+        <span>Collateral</span>
+        <strong>{{ loanCollateral }}</strong>
+      </div>
+
+      <div class="row">
+        <span>Include Extra Fees</span>
+        <strong>{{ includeExtraFees ? 'Yes' : 'No' }}</strong>
+      </div>
+
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

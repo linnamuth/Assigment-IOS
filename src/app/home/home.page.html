@@ -1,20 +1,117 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      Blank
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-content>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Blank</ion-title>
-    </ion-toolbar>
-  </ion-header>
-
-  <div id="container">
-    <strong>Ready to create an app?</strong>
-    <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+  <!-- Header -->
+  <div class="calculator-header">
+    <h1>Loan Calculator</h1>
+    <p class="subtitle">Smart calculations for your financial needs</p>
   </div>
+
+  <!-- Payment Summary -->
+  <div class="payment-summary" *ngIf="monthlyPayment > 0">
+    <h3 class="summary-title">Estimated Monthly Payment</h3>
+    <p class="payment-amount">{{ monthlyPayment | number:'1.2-2' }}</p>
+
+    <div class="payment-breakdown">
+      <div class="breakdown-item">
+        <span class="label">Total Interest</span>
+        <span class="value">{{ totalInterest | number:'1.2-2' }}</span>
+      </div>
+      <div class="breakdown-item">
+        <span class="label">Total Payback</span>
+        <span class="value">{{ totalPayback | number:'1.2-2' }}</span>
+      </div>
+      <div class="breakdown-item" *ngIf="includeExtraFees">
+        <span class="label">Extra Fees</span>
+        <span class="value">{{ extraFees | number:'1.2-2' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Divider -->
+  <div class="section-divider">
+    <span class="divider-text">Loan Details</span>
+    <div class="divider-line"></div>
+  </div>
+
+  <!-- Loan Details Form -->
+  <div class="loan-details-card">
+    <div class="card-header">
+      <h2>Configure Your Loan</h2>
+    </div>
+    <div class="card-content">
+
+      <!-- Loan Amount -->
+      <div class="form-group">
+        <label class="form-label">Loan Amount</label>
+        <div class="input-with-prefix">
+          <span class="prefix">$</span>
+          <ion-input type="number" placeholder="0.00" [(ngModel)]="loanAmount">
+          </ion-input>
+        </div>
+      </div>
+
+      <!-- Interest Rate -->
+      <div class="form-group">
+        <label class="form-label">Interest Rate (%)</label>
+        <div class="input-with-prefix">
+          <ion-input type="number" placeholder="0.00" [(ngModel)]="interestRate">
+          </ion-input>
+          <span class="suffix">%</span>
+        </div>
+        <p class="error" *ngIf="interestRate < 0">Interest rate must be ≥ 0.</p>
+      </div>
+
+      <!-- Duration -->
+      <div class="form-group">
+        <label class="form-label">Duration (Months)</label>
+        <div class="input-with-prefix">
+          <ion-input type="number" placeholder="12" [(ngModel)]="durationMonths" (ionChange)="onDurationChange()">
+          </ion-input>
+
+
+        </div>
+        <p class="error" *ngIf="durationMonths <= 0">Duration must be at least 1 month.</p>
+      </div>
+
+
+
+    </div>
+  </div>
+
+  <!-- Calculate Button -->
+  <ion-button expand="block" class="calculate-button" (click)="calculateLoan()">
+    <ion-icon slot="start" name="calculator-outline"></ion-icon>
+    Calculate
+  </ion-button>
+
+  <!-- Action Buttons -->
+  <!-- Action Buttons -->
+  <div *ngIf="monthlyPayment > 0" class="action-buttons-row">
+    <ion-button class="btn-apply" (click)="applyNow()">
+      Apply Now
+    </ion-button>
+    <!-- <ion-button class="btn-clear" (click)="clearForm()">
+      Clear Form
+    </ion-button> -->
+  </div>
+
+
+
+  <!-- Calculation History -->
+  <!-- <div class="history-section" *ngIf="recentCalculations.length > 0">
+    <h3 class="history-title">Recent Calculations</h3>
+    <div *ngFor="let item of recentCalculations" class="history-card">
+      <div class="history-item">
+        <div class="history-info">
+          <p class="history-name">{{ item.title }}</p>
+          <p class="history-details">{{ item.duration }} | {{ item.rate }}</p>
+        </div>
+        <div class="history-numbers">
+          <p class="history-amount">{{ item.amount }}</p>
+          <p class="history-date">{{ item.date }}</p>
+        </div>
+      </div>
+    </div>
+  </div> -->
+
 </ion-content>

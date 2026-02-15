@@ -1,0 +1,45 @@
+<ion-content class="ion-padding">
+
+  <div class="search-row">
+    <div class="search-box">
+      <ion-icon name="search-outline"></ion-icon>
+      <input type="text" placeholder="Search amount or duration..."
+             [(ngModel)]="searchText" (input)="applyFilters()">
+    </div>
+  </div>
+
+  <div class="filter-scroll">
+    <div class="chip" [class.active]="selectedFilter === 'All Time'" (click)="setFilter('All Time')">All Time</div>
+    <div class="chip" [class.active]="selectedFilter === 'Today'" (click)="setFilter('Today')">Today</div>
+    <div class="chip" [class.active]="selectedFilter === 'Last 7 Days'" (click)="setFilter('Last 7 Days')">Last 7 Days</div>
+  </div>
+
+  <div *ngIf="groupedHistory.length > 0; else emptyState">
+    <div *ngFor="let group of groupedHistory" class="group-container">
+      <h3 class="group-title">{{ group.label }}</h3>
+
+      <div *ngFor="let item of group.items" class="loan-card" (click)="openDetail(item)">
+        <div class="card-info">
+          <span class="amount">{{ formatCurrency(item.amount) }}</span>
+          <div class="details">
+            <span>{{ item.duration }} Mo</span>
+            <span class="dot"></span>
+            <span>{{ item.interestRate }}% Rate</span>
+          </div>
+        </div>
+        <div class="card-right">
+          <span class="time">{{ item.time }}</span>
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #emptyState>
+    <div class="empty-state">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <p>No results found</p>
+    </div>
+  </ng-template>
+
+</ion-content>

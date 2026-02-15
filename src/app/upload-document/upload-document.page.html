@@ -1,0 +1,108 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tabs/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Loan Application</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+
+  <!-- Step Indicator -->
+  <div class="step-indicator card">
+    <p class="step-text">STEP 2: <strong>PERSONAL & LOAN INFO</strong></p>
+    <ion-progress-bar value="0.66" color="primary"></ion-progress-bar>
+    <p class="step-number">2 of 3</p>
+  </div>
+
+  <!-- Personal Info -->
+  <div class="card form-section">
+    <h3 class="section-title">Personal Information</h3>
+
+    <ion-item class="styled-select">
+      <ion-label position="floating">Marital Status</ion-label>
+      <ion-select [(ngModel)]="maritalStatus" interface="popover">
+        <ion-select-option *ngFor="let status of maritalStatuses" [value]="status">
+          {{ status }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item class="styled-select">
+      <ion-label position="floating">Current Occupation</ion-label>
+      <ion-select [(ngModel)]="currentOccupation" interface="popover">
+        <ion-select-option *ngFor="let occupation of occupations" [value]="occupation">
+          {{ occupation }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item class="styled-select">
+      <ion-label position="floating">Source of Income</ion-label>
+      <ion-select [(ngModel)]="sourceOfIncome" interface="popover">
+        <ion-select-option *ngFor="let source of incomeSources" [value]="source">
+          {{ source }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item class="styled-input">
+      <ion-label position="floating">Company / Current Work</ion-label>
+      <ion-input [(ngModel)]="company"></ion-input>
+    </ion-item>
+
+    <!-- Current Address Fields -->
+    <h4 class="section-subtitle">Current Address</h4>
+
+    <ion-item class="styled-input">
+  <ion-input type="text" [(ngModel)]="province" placeholder="province"></ion-input>
+</ion-item>
+
+<ion-item class="styled-input">
+  <ion-input type="text" [(ngModel)]="district" placeholder="district"></ion-input>
+</ion-item>
+
+<ion-item class="styled-input">
+  <ion-input type="text" [(ngModel)]="commune" placeholder="commune"></ion-input>
+</ion-item>
+
+
+
+  </div>
+
+  <!-- Loan Info -->
+ <div class="card form-section">
+  <h3 class="section-title">Loan Information</h3>
+
+  <ion-item>
+    <ion-label position="floating">Loan Type</ion-label>
+    <ion-select [(ngModel)]="loanType" interface="popover" (ionChange)="saveLoanData()">
+      <ion-select-option *ngFor="let type of loanTypes" [value]="type">{{ type }}</ion-select-option>
+    </ion-select>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="floating">Loan Amount</ion-label>
+    <ion-input type="number" [(ngModel)]="loanAmount" (ionChange)="saveLoanData()"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="floating">Interest Rate (%)</ion-label>
+    <ion-input type="number" [(ngModel)]="interestRate" (ionChange)="saveLoanData()"></ion-input>
+  </ion-item>
+
+  <ion-item>
+    <ion-label position="floating">Duration (Months)</ion-label>
+    <ion-input type="number" [(ngModel)]="durationMonths" (ionChange)="saveLoanData()"></ion-input>
+  </ion-item>
+</div>
+
+
+  <!-- Submit Button -->
+  <ion-button expand="block" color="primary" (click)="submitApplication()">
+    Submit Application
+    <ion-icon slot="end" name="arrow-forward-outline"></ion-icon>
+  </ion-button>
+
+</ion-content>

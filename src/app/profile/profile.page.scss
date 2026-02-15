@@ -1,0 +1,173 @@
+// profile.page.scss
+
+.profile-content {
+  --background: #f8fafc; // Clean, modern light background
+}
+
+.profile-container {
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+// 1. Profile Header Section
+.profile-header {
+  text-align: center;
+  padding: 30px 0;
+  background: white;
+  border-radius: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+  margin-bottom: 25px;
+
+ .avatar-container {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 15px;
+
+  .profile-img, .placeholder-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 35%; // Squircle
+    border: 4px solid #fff;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  }
+
+  .profile-img {
+    object-fit: cover;
+  }
+
+  .placeholder-avatar {
+    background: #e2e8f0; // Light grey background
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    ion-icon {
+      font-size: 60px;
+      color: #94a3b8; // Darker grey icon
+    }
+  }
+
+  .edit-btn {
+    position: absolute;
+    bottom: -5px;
+    right: -5px;
+    --background: #ffffff;
+    --border-radius: 50%;
+    height: 40px;
+    width: 40px;
+    margin: 0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+    --padding-start: 0;
+    --padding-end: 0;
+
+    ion-icon {
+      color: #0ea5e9;
+      font-size: 20px;
+    }
+  }
+}
+
+  h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #1e293b;
+    letter-spacing: -0.5px;
+  }
+
+  p {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: 0.95rem;
+    font-weight: 500;
+  }
+}
+
+// 2. Settings / Menu List
+.settings-list {
+  background: white;
+  border-radius: 24px;
+  overflow: hidden;
+  padding: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+
+  ion-item {
+    --padding-start: 12px;
+    --inner-padding-end: 12px;
+    --background: transparent;
+    --border-style: none;
+    margin-bottom: 4px;
+
+    &::part(native) {
+      border-radius: 16px;
+      transition: background 0.2s ease;
+    }
+
+    &:active::part(native) {
+      background: #f0f9ff;
+    }
+
+    .icon-box {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 16px;
+
+      // Dynamic colors for icons
+      &.blue { background: #e0f2fe; color: #0ea5e9; }
+      &.green { background: #dcfce7; color: #22c55e; }
+      &.orange { background: #ffedd5; color: #f97316; }
+      &.red { background: #fee2e2; color: #ef4444; }
+
+      ion-icon { font-size: 20px; }
+    }
+
+    ion-label {
+      h3 { font-weight: 700; color: #334155; margin-bottom: 2px; }
+      p { color: #94a3b8; font-size: 0.8rem; }
+    }
+  }
+}
+
+// 3. Logout Section
+.logout-container {
+  margin-top: 30px;
+  padding: 0 10px;
+
+  .logout-btn {
+    --background: #fee2e2;
+    --color: #ef4444;
+    --border-radius: 16px;
+    font-weight: 700;
+    margin: 0;
+    height: 56px;
+    --box-shadow: none;
+
+    &:active {
+      opacity: 0.8;
+    }
+  }
+}
+
+// 4. App Version Text
+.version-text {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 0.75rem;
+  color: #cbd5e1;
+  font-weight: 600;
+  letter-spacing: 1px;
+}
+.profile-img {
+  width: 110px;
+  height: 110px;
+  border-radius: 35%;
+  object-fit: cover; // This is crucial for non-square uploads
+  border: 4px solid #ffffff;
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+}
+

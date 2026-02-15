@@ -1,0 +1,47 @@
+<ion-content [fullscreen]="true" class="auth-content">
+  <div class="bg-blur-circle primary"></div>
+  <div class="bg-blur-circle secondary"></div>
+
+  <div class="auth-container">
+    <div class="header-section">
+      <div class="logo-wrapper">
+        <div class="logo-inner">
+          <ion-icon name="lock-open-sharp"></ion-icon>
+        </div>
+      </div>
+      <h1 class="main-title">Welcome Back</h1>
+      <p class="subtitle">Securely sign in to your loan account</p>
+    </div>
+
+    <div class="form-wrapper">
+      <div class="input-group">
+        <label>USERNAME OR EMAIL</label>
+        <ion-item lines="none" class="custom-input">
+          <ion-icon name="person-outline" slot="start"></ion-icon>
+          <ion-input [(ngModel)]="identity" type="text" placeholder="your_id"></ion-input>
+        </ion-item>
+      </div>
+
+      <div class="input-group">
+        <label>PASSWORD</label>
+        <ion-item lines="none" class="custom-input">
+          <ion-icon name="shield-outline" slot="start"></ion-icon>
+          <ion-input [(ngModel)]="password" [type]="showPassword ? 'text' : 'password'" placeholder="••••••••"></ion-input>
+          <ion-button slot="end" fill="clear" color="medium" (click)="showPassword = !showPassword">
+            <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
+          </ion-button>
+        </ion-item>
+        <div class="forgot-link">Forgot Password?</div>
+      </div>
+
+      <ion-button expand="block" class="main-submit-btn" (click)="onLogin()">
+        Sign In
+        <ion-icon name="chevron-forward-outline" slot="end"></ion-icon>
+      </ion-button>
+    </div>
+
+    <div class="footer-actions">
+      <p>New to Loan App? <span (click)="goToRegister()">Create Account</span></p>
+    </div>
+  </div>
+</ion-content>

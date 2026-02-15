@@ -1,0 +1,97 @@
+<ion-content class="repayment-page">
+  <div class="repayment-container">
+
+    <h1 class="main-title">Repayment Schedule</h1>
+    <h2 class="subtitle">Your Loan – {{ durationMonths }} Months</h2>
+
+    <div class="loan-info">
+      <div class="info-item">
+        <div class="label">Total Loan Amount</div>
+        <div class="amount">{{ formatCurrency(loanAmount) }}</div>
+      </div>
+      <div class="horizontal-divider"></div>
+      <div class="info-item">
+        <div class="label">Remaining Balance</div>
+        <div class="amount">{{ formatCurrency(remainingBalance) }}</div>
+      </div>
+    </div>
+
+    <div class="progress-section">
+      <div class="progress-header">
+        <span class="progress-percent">{{ (progressValue * 100) | number:'1.0-0'}}% Completed</span>
+        <span class="total-repaid-label">Repaid: {{ formatCurrency(totalRepaid) }}</span>
+      </div>
+      <ion-progress-bar [value]="progressValue" color="primary"></ion-progress-bar>
+    </div>
+
+    <div class="schedule-section">
+      <div class="schedule-header">
+        <h2 class="schedule-title">{{ currentYear }} Schedule</h2>
+        <span class="badge">{{ months.length }} Installments</span>
+      </div>
+      <p class="instruction">Tap a month to toggle payment status</p>
+
+      <div class="month-grid">
+        <div *ngFor="let month of months; let i = index" class="month-card" [class.is-paid]="month.paid"
+          (click)="togglePayment(month, i)">
+
+          <div class="month-info">
+            <div class="month-circle">
+              <span *ngIf="!month.paid">{{ month.number }}</span>
+              <ion-icon *ngIf="month.paid" [icon]="checkmarkCircle"></ion-icon>
+            </div>
+            <div class="month-text">
+              <span class="name">{{ month.name }}</span>
+              <span class="status-label">{{ month.paid ? 'Payment Received' : 'Pending' }}</span>
+            </div>
+          </div>
+
+          <div class="month-amount-box">
+            <span class="amount">{{ month.amount }}</span>
+            <div class="status-dot" [class.active]="month.paid"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="summary-cards">
+      <div class="summary-card">
+        <div class="icon-wrapper blue">
+          <ion-icon name="cash-outline"></ion-icon>
+        </div>
+        <div class="card-content">
+          <span class="label">Total Amount Paid</span>
+          <span class="value">{{ formatCurrency(loanAmount + totalInterestPaid) }}</span>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="icon-wrapper green">
+          <ion-icon name="calendar-outline"></ion-icon>
+        </div>
+        <div class="card-content">
+          <span class="label">Pay-off Date</span>
+          <span class="value">{{ payoffDate }}</span>
+        </div>
+      </div>
+
+      <div class="summary-card">
+        <div class="icon-wrapper orange">
+          <ion-icon name="pricetag"></ion-icon>
+        </div>
+        <div class="card-content">
+          <span class="label">Interest Rate</span>
+          <span class="value">{{ interestRate }}%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="save-section">
+      <ion-button expand="block" class="amortization-btn" (click)="saveSchedule()">
+        Check Payment
+        <ion-icon slot="end" name="calendar-number-outline"></ion-icon>
+      </ion-button>
+    </div>
+
+  </div>
+</ion-content>

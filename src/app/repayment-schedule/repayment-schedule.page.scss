@@ -1,0 +1,211 @@
+.repayment-container {
+  padding: 16px;
+  background: #fdfdfd;
+}
+
+.main-title { font-size: 24px; font-weight: 800; color: #1a1a1a; margin-bottom: 4px; }
+.subtitle { font-size: 16px; color: #666; margin-bottom: 24px; }
+
+/* Loan Info Card */
+.loan-info {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  margin-bottom: 20px;
+
+  .info-item {
+    .label { font-size: 14px; color: #888; margin-bottom: 4px; }
+    .amount { font-size: 20px; font-weight: 700; color: #3880ff; }
+  }
+  .horizontal-divider { height: 1px; background: #f0f0f0; margin: 15px 0; }
+}
+
+/* Progress */
+.progress-section {
+  margin-bottom: 24px;
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  ion-progress-bar { height: 8px; border-radius: 4px; }
+}
+
+/* Summary Cards from Image */
+.summary-cards {
+  margin-top: 20px;
+}
+
+.summary-card {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 10px;
+  border: 1px solid #f0f0f0;
+
+  .icon-wrapper {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    margin-right: 12px;
+
+    &.blue { background: #eef4ff; color: #3880ff; }
+    &.green { background: #e8f5e9; color: #2ecc71; }
+    &.orange { background: #fff3e0; color: #e67e22; }
+  }
+
+  .card-content {
+    display: flex;
+    justify-content: space-between;
+    flex: 1;
+    .label { color: #555; font-size: 14px; }
+    .value { font-weight: 700; color: #000; }
+  }
+}
+
+/* Action Button */
+.amortization-btn {
+  --background: #1a56db;
+  --border-radius: 12px;
+  height: 56px;
+  margin-top: 10px;
+  font-weight: 600;
+  text-transform: none;
+}
+
+/* Month List Item */
+.month-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  border-bottom: 1px solid #f5f5f5;
+  &.paid { background: #f0fff4; }
+  .status { font-size: 12px; padding: 2px 8px; border-radius: 4px; background: #eee; }
+  .paid-status { background: #2ecc71; color: white; }
+}
+.schedule-section {
+  padding: 10px 0;
+
+  .schedule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+
+    .badge {
+      background: #eef4ff;
+      color: #3880ff;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+  }
+
+  .instruction {
+    font-size: 13px;
+    color: #888;
+    margin-bottom: 15px;
+  }
+}
+
+.month-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #ffffff;
+  border: 1.5px solid #f0f2f5;
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 12px;
+  transition: all 0.2s ease-in-out;
+
+  /* Style for PAID state */
+  &.is-paid {
+    border-color: #2ecc71;
+    background: #fafffb;
+    transform: scale(0.98);
+
+    .month-circle {
+      background: #2ecc71;
+      color: white;
+      border-color: #2ecc71;
+    }
+
+    .amount {
+      color: #2ecc71;
+      text-decoration: line-through;
+      opacity: 0.7;
+    }
+  }
+
+  .month-info {
+    display: flex;
+    align-items: center;
+
+    .month-circle {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 2px solid #e0e6ed;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      margin-right: 12px;
+      color: #5f6368;
+      transition: 0.3s;
+    }
+
+    .month-text {
+      display: flex;
+      flex-direction: column;
+
+      .name {
+        font-weight: 700;
+        color: #2c3e50;
+        font-size: 15px;
+      }
+      .status-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        color: #95a5a6;
+      }
+    }
+  }
+
+  .month-amount-box {
+    text-align: right;
+    display: flex;
+    align-items: center;
+
+    .amount {
+      font-weight: 700;
+      color: #2c3e50;
+      margin-right: 10px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #dfe6e9;
+
+      &.active {
+        background: #2ecc71;
+        box-shadow: 0 0 8px rgba(46, 204, 113, 0.5);
+      }
+    }
+  }
+}
