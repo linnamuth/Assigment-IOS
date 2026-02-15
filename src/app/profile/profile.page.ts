@@ -151,7 +151,6 @@ export class ProfilePage implements OnInit {
         {
           text: 'Yes',
           handler: () => {
-            sessionStorage.clear(); // Wipes EVERYTHING in session (user, history, loan)
             this.navCtrl.navigateRoot('/login', { animated: true, animationDirection: 'back' });
           }
         }
