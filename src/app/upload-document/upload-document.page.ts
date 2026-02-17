@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { IonSelect, IonSelectOption } from '@ionic/angular/standalone';
 import { LoadingController, AlertController } from '@ionic/angular';
+import { Geolocation } from '@capacitor/geolocation';
 
 import {
   IonContent,
@@ -70,19 +71,11 @@ export class UploadDocumentPage implements OnInit {
   email: string = '';
   placeOfBirth: string = '';
   currentAddress: string = '';
-  address = {
-    province: '',
-    district: '',
-    commune: '',
-    village: ''
-  };
-  provinces = '';
-  districts = '';
-  communes = '';
 
-  province = '';
-  district = '';
-  commune = '';
+province: string = '';
+district: string = '';
+commune: string = '';
+
 
   maritalStatuses: string[] = ['Single', 'Married', 'Divorced', 'Widowed'];
   occupations: string[] = ['Employee', 'Business Owner', 'Self-Employed', 'Unemployed', 'Student'];
@@ -127,6 +120,7 @@ export class UploadDocumentPage implements OnInit {
 
   ngOnInit() {
     this.loadLoanFromSession();
+    this.getCurrentCoordinates();
   }
 
   loadLoanFromSession() {
@@ -232,8 +226,6 @@ export class UploadDocumentPage implements OnInit {
   }
 
 
-
-
  saveLoanData() {
   const loanData = {
     loanType: this.loanType,
@@ -252,6 +244,42 @@ export class UploadDocumentPage implements OnInit {
   } else {
     sessionStorage.setItem('loanData', JSON.stringify(loanData));
   }
+}
+ async getCurrentCoordinates() {
+    try {
+      // 1️⃣ Get device coordinates
+      const coordinates = await Geolocation.getCurrentPosition();
+      const lat = coordinates.coords.latitude;
+      const lng = coordinates.coords.longitude;
+
+      // 2️⃣ Use lat/lng to get human-readable address
+      await this.getAddressFromCoordinates(lat, lng);
+
+    } catch (err) {
+      console.error('Error getting location', err);
+      this.currentAddress = 'Location unavailable';
+    }
+  }
+
+ async getAddressFromCoordinates(lat: number, lng: number) {
+  const response = await fetch(
+    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
+  );
+
+  const data = await response.json();
+
+  // Assign to each input separately
+  this.province = data.address.state || '';
+  this.district =
+    data.address.city ||
+    data.address.town ||
+    data.address.county ||
+    '';
+
+  this.commune =
+    data.address.suburb ||
+    data.address.village ||
+    '';
 }
 
 }

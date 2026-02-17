@@ -43,36 +43,57 @@ export class RepaymentSchedulePage implements OnInit {
   ngOnInit() {
     this.loadLoanData();
   }
-
-
-  loadLoanData() {
-    // UPDATED: Now reading from sessionStorage
-    const sessionData = sessionStorage.getItem('user');
-    const currentUser = JSON.parse(sessionData || '{}');
-
-    if (!currentUser || !currentUser.currentLoan) {
-      this.router.navigate(['/tabs/home']);
-      return;
+    ionViewWillEnter() {
+      this.loadLoanData();
     }
 
-    const loan = currentUser.currentLoan;
-    this.loanAmount = loan.amount || 0;
-    this.durationMonths = loan.duration || 12;
-    this.interestRate = loan.interest || 0;
-    this.monthlyPayment = loan.monthlyPayment || (this.loanAmount / this.durationMonths);
 
-    // Load schedule from session user object
-    if (currentUser.repaymentSchedule && currentUser.repaymentSchedule.length > 0) {
-      this.months = currentUser.repaymentSchedule.map((m: any) => ({
-        ...m,
-        locked: m.paid === true
-      }));
-    } else {
-      this.generateMonths();
-    }
+ loadLoanData() {
+  const sessionData = sessionStorage.getItem('user');
+  const currentUser = JSON.parse(sessionData || '{}');
+
+  if (!currentUser) {
+    this.months = [];
+    this.presentToast('No user data found.', 'warning');
+    return;
   }
 
-  generateMonths() {
+  // Try current loan first
+  let loan: any = currentUser.currentLoan;
+
+  // If no current loan, check loanHistory
+  if (!loan && currentUser.loanHistory && currentUser.loanHistory.length > 0) {
+    loan = currentUser.loanHistory[0]; // most recent loan
+    this.presentToast('Displaying your completed loan schedule.', 'success');
+  }
+
+  // If still no loan, allow user to generate a schedule
+  if (!loan) {
+    this.months = [];
+    return; // Do NOT navigate away, let user click "Generate Schedule"
+  }
+
+  // Load loan data
+  this.loanAmount = loan.amount || 0;
+  this.durationMonths = loan.duration || 12;
+  this.interestRate = loan.interest || 0;
+  this.monthlyPayment = loan.monthly || (this.loanAmount / this.durationMonths);
+
+  // Load repayment schedule
+  if (currentUser.repaymentSchedule && currentUser.repaymentSchedule.length > 0) {
+    this.months = currentUser.repaymentSchedule.map((m: any) => ({
+      ...m,
+      locked: m.paid === true
+    }));
+  } else {
+    // If loan completed, mark all months as paid
+    const isCompleted = loan.status === 'Completed';
+    this.generateMonths(isCompleted);
+  }
+}
+
+
+  generateMonths(isCompleted: boolean = false) {
     const loanDate = new Date();
 
     this.months = Array.from({ length: this.durationMonths }, (_, i) => {
@@ -89,8 +110,8 @@ export class RepaymentSchedulePage implements OnInit {
         name: month,
         fullDate: `${day} - ${month} - ${year}`,
         amount: `$${this.monthlyPayment.toFixed(2)}`,
-        paid: false,
-        locked: false
+        paid: isCompleted,
+        locked: isCompleted
       };
     });
   }
