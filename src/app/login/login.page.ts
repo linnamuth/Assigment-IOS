@@ -83,7 +83,9 @@ export class LoginPage {
   goToRegister() {
     this.router.navigate(['/register']);
   }
-
+ goToForgotPassword() {
+    this.router.navigate(['/forgot-password']);
+  }
   async presentToast(message: string, color: string = 'dark') {
     const toast = await this.toastCtrl.create({
       message,
@@ -94,4 +96,6 @@ export class LoginPage {
     });
     await toast.present();
   }
+
+
 }

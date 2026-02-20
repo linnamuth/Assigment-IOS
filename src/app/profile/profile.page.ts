@@ -38,7 +38,7 @@ export class ProfilePage implements OnInit {
    * 1. Load the active user from SessionStorage
    */
   loadUserData() {
-    const data = sessionStorage.getItem('user');
+    const data = sessionStorage.getItem('active_user');
     if (data) {
       this.user = JSON.parse(data);
     } else {
@@ -105,7 +105,7 @@ export class ProfilePage implements OnInit {
       this.user.email = newEmail;
 
       // Save to SessionStorage
-      sessionStorage.setItem('user', JSON.stringify(this.user));
+      sessionStorage.setItem('active_user', JSON.stringify(this.user));
 
       // Sync with the temporary "All Users" session list
       this.updateGlobalUserDatabase(this.user);

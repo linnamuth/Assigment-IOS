@@ -178,3 +178,21 @@ $muted-slate: #64748b;
     text-underline-offset: 4px;
   }
 }
+.divider {
+  text-align: center;
+  margin: 16px 0;
+  position: relative;
+}
+
+.divider span {
+  background: white;
+  padding: 0 12px;
+  font-size: 12px;
+  color: #666;
+}
+
+.google-btn {
+  --background: #ffffff;
+  --color: #000;
+  border: 1px solid #ddd;
+}

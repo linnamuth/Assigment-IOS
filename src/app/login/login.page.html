@@ -26,13 +26,17 @@
         <label>PASSWORD</label>
         <ion-item lines="none" class="custom-input">
           <ion-icon name="shield-outline" slot="start"></ion-icon>
-          <ion-input [(ngModel)]="password" [type]="showPassword ? 'text' : 'password'" placeholder="••••••••"></ion-input>
+          <ion-input [(ngModel)]="password" [type]="showPassword ? 'text' : 'password'"
+            placeholder="••••••••"></ion-input>
           <ion-button slot="end" fill="clear" color="medium" (click)="showPassword = !showPassword">
             <ion-icon [name]="showPassword ? 'eye-off-outline' : 'eye-outline'"></ion-icon>
           </ion-button>
         </ion-item>
-        <div class="forgot-link">Forgot Password?</div>
+        <div class="forgot-link"><ion-button fill="clear" size="small" (click)="goToForgotPassword()">
+            Forgot your password?
+          </ion-button> </div>
       </div>
+
 
       <ion-button expand="block" class="main-submit-btn" (click)="onLogin()">
         Sign In

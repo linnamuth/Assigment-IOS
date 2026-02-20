@@ -1,52 +1,51 @@
-<ion-header class="ion-no-border">
-  <ion-toolbar color="primary">
-    <ion-title>{{ title }}</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="closeModal()">Close</ion-button>
-    </ion-buttons>
-  </ion-toolbar>
-</ion-header>
+<ion-content [forceOverscroll]="false" class="black-bg">
 
-<ion-content class="ion-padding">
-  <div class="video-container">
-    <video
-      #videoPlayer
-      width="100%"
-      controls
-      autoplay
-      [src]="videoUrl"
-      (loadedmetadata)="onMetadataLoaded($event)"
-      (timeupdate)="onTimeUpdate($event)"
-      controlsList="nodownload"
-    ></video>
-  </div>
+  <div class="main-wrapper">
+    <ion-button (click)="close()" fill="clear" class="close-btn">
+      <ion-icon name="close-outline" slot="icon-only"></ion-icon>
+    </ion-button>
 
-  <div class="progress-card ion-margin-top">
-    <div class="timer-row">
-      <ion-icon [name]="canCollect ? 'checkmark-circle' : 'time-outline'"
-                [color]="canCollect ? 'success' : 'warning'">
-      </ion-icon>
-      <span class="timer-text">{{ displayTime }}</span>
+    <div class="video-cinema-container">
+      <div class="crop-window">
+        <div id="youtube-player"></div>
+      </div>
     </div>
 
-    <ion-progress-bar
-      [value]="watchProgress"
-      [color]="canCollect ? 'success' : 'primary'">
-    </ion-progress-bar>
+    <div class="floating-controls">
+      <div class="stats-row">
+        <div class="reward-pill">
+          <ion-icon name="wallet-outline"></ion-icon>
+          ${{ reward.toFixed(2) }}
+        </div>
+        <div class="timer-pill">{{ displayTime }}</div>
+      </div>
 
-    <p class="status-msg" [class.ready]="canCollect">
-      {{ canCollect ? 'Reward unlocked! You can collect now.' : 'Watch 1 minute to unlock reward.' }}
-    </p>
+      <ion-progress-bar
+        [value]="watchProgress"
+        [color]="canCollect ? 'success' : 'primary'">
+      </ion-progress-bar>
+
+      <ion-button
+        *ngIf="!rewardClaimed"
+        expand="block"
+        [color]="canCollect ? 'success' : 'medium'"
+        [disabled]="!canCollect || isProcessing"
+        (click)="collectReward()"
+        class="claim-btn">
+        <span *ngIf="!isProcessing">{{ canCollect ? 'COLLECT REWARD' : 'WATCHING...' }}</span>
+        <ion-spinner name="crescent" *ngIf="isProcessing"></ion-spinner>
+      </ion-button>
+
+      <ion-button
+        *ngIf="rewardClaimed"
+        expand="block"
+        fill="outline"
+        color="light"
+        (click)="close()"
+        class="claim-btn">
+        DONE - CLOSE
+      </ion-button>
+    </div>
   </div>
-
-  <ion-button
-    expand="block"
-    color="success"
-    class="collect-btn ion-margin-top"
-    [disabled]="!canCollect || isProcessing"
-    (click)="collectReward()">
-    <ion-icon name="cash-outline" slot="start"></ion-icon>
-    Collect ${{ reward }}
-  </ion-button>
 
 </ion-content>

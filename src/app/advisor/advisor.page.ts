@@ -45,7 +45,7 @@ export class AdvisorPage implements OnInit {
     private toastCtrl: ToastController,
     private loadingCtrl: LoadingController,
     private auth: AuthService
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.initUserPage();
@@ -56,16 +56,15 @@ export class AdvisorPage implements OnInit {
    */
   async initUserPage() {
     // CHANGED: Reading from sessionStorage
-    const userData = sessionStorage.getItem('user');
+    const userData = sessionStorage.getItem('active_user');
 
     if (userData) {
       const user = JSON.parse(userData);
 
       this.userBalance = user.balance || 0;
       this.referralCollected = user.referralClaimed || false;
-      this.refLink = `https://yourapp.com/ref/${user.username || 'user'}`;
+      this.refLink = `https://loanapp.com/ref/${user.username || 'user'}`;
 
-      // Load tasks and sync with the user's session-based progress
       await this.loadDynamicData(user.completedVideoIds || []);
     } else {
       this.isLoading = false;
@@ -74,8 +73,6 @@ export class AdvisorPage implements OnInit {
 
   async loadDynamicData(completedIds: number[], event?: any) {
     this.isLoading = true;
-
-    // Simulate API Fetch
     setTimeout(() => {
       const availableTasks: VideoTask[] = [
         {
@@ -84,8 +81,8 @@ export class AdvisorPage implements OnInit {
           description: 'Watch 1 min to earn $0.10 instantly.',
           reward: 0.1,
           duration: '5 min',
-          image: 'https://i.ytimg.com/vi/d0J-lW878qQ/hqdefault.jpg',
-          videoUrl: 'https://www.w3schools.com/html/mov_bbb.mp4',
+          image: 'https://live.staticflickr.com/65535/52870902670_e5b64d2ff4_b.jpg',
+          videoUrl: 'https://www.youtube.com/shorts/1idf4CCWijg?feature=share',
           collected: false
         },
         {
@@ -94,8 +91,8 @@ export class AdvisorPage implements OnInit {
           description: 'Earn $0.20 by completing this task.',
           reward: 0.2,
           duration: '8 min',
-          image: 'https://i.ytimg.com/vi/3JZ_D3ELwOQ/hqdefault.jpg',
-          videoUrl: 'https://www.w3schools.com/html/movie.mp4',
+          image: 'https://tse2.mm.bing.net/th/id/OIP.HiO9qN0VfyQk-97Nh1VERgHaHa?rs=1&pid=ImgDetMain&o=7&rm=3',
+          videoUrl: 'https://www.youtube.com/shorts/E4sxmoEYhqg?feature=share',
           collected: false
         }
       ];
@@ -114,8 +111,7 @@ export class AdvisorPage implements OnInit {
    * 2. PERSIST REWARDS TO SESSION STORAGE
    */
   private async persistUserReward(amount: number, videoId?: number) {
-    // CHANGED: Reading from sessionStorage
-    const userData = sessionStorage.getItem('user');
+    const userData = sessionStorage.getItem('active_user');
 
     if (userData) {
       const user = JSON.parse(userData);
@@ -137,7 +133,7 @@ export class AdvisorPage implements OnInit {
       }
 
       // Save updated user to current session
-      sessionStorage.setItem('user', JSON.stringify(user));
+      sessionStorage.setItem('active_user', JSON.stringify(user));
 
       // NEW: Sync with global session user list to maintain data across the app session
       this.syncWithGlobalSession(user);
@@ -184,11 +180,12 @@ export class AdvisorPage implements OnInit {
     await modal.present();
     const { data } = await modal.onDidDismiss();
 
-    if (data?.rewardCollected) {
-      video.collected = true;
-      await this.persistUserReward(video.reward, video.id);
-      this.presentToast(`Success! $${video.reward} added to your account.`, 'success');
-    }
+   if (data && data.success) {
+    video.collected = true;
+    // Use data.claimedAmount which you passed from the modal
+    await this.persistUserReward(data.claimedAmount, video.id);
+    this.presentToast(`Success! $${data.claimedAmount} added to your account.`, 'success');
+  }
   }
 
   async shareReferral() {

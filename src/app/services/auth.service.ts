@@ -3,16 +3,16 @@ import { BehaviorSubject } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly STORAGE_KEY = 'user';
+  private readonly STORAGE_KEY = 'all_users_list';
 
-  // Initialize stream with LocalStorage data
+  // Initialize stream with sessionStorage data
   private userSubject = new BehaviorSubject<any>(this.getUserFromStorage());
   user$ = this.userSubject.asObservable();
 
   constructor() {}
 
   private getUserFromStorage() {
-    const data = localStorage.getItem(this.STORAGE_KEY);
+    const data = sessionStorage.getItem(this.STORAGE_KEY);
     return data ? JSON.parse(data) : null;
   }
 
@@ -24,7 +24,7 @@ export class AuthService {
       creditLimit: 5000, // Default limit
       joined: new Date().toISOString()
     };
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(newUser));
+    sessionStorage.setItem(this.STORAGE_KEY, JSON.stringify(newUser));
     this.userSubject.next(newUser);
   }
 

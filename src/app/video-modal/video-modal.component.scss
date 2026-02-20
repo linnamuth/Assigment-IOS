@@ -1,35 +1,99 @@
-:host {
-  .modal-wrapper {
-    border-radius: 0 !important;
-    height: 100%;
-    max-height: 100%;
+.black-bg {
+  --background: #000;
+  --ion-safe-area-top: 20px;
+  --ion-safe-area-bottom: 20px;
+}
+
+.main-wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; // Vertically centers the video
+  height: 100vh;
+  width: 100vw;
+  position: relative;
+  background: #000;
+}
+
+.close-btn {
+  position: absolute;
+  top: var(--ion-safe-area-top);
+  left: 10px;
+  z-index: 100;
+  --color: white;
+  font-size: 24px;
+}
+
+// THE VIDEO CARD
+.video-cinema-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  .crop-window {
+    width: 100vw;
+    aspect-ratio:3/ 9;
+    position: relative;
+    overflow: hidden;
+    background: #000;
+
+    ::ng-deep iframe,
+    #youtube-player {
+      position: absolute !important;
+      top: -10% !important;
+      left: 0 !important;
+      width: 100% !important;
+      height: 120% !important;
+      border: none;
+    }
+  }
+}
+
+// FLOATING BOTTOM UI
+.floating-controls {
+  position: absolute;
+  bottom: var(--ion-safe-area-bottom);
+  left: 0;
+  width: 100%;
+  padding: 20px;
+  background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+
+  .stats-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+
+    .reward-pill, .timer-pill {
+      background: rgba(255, 255, 255, 0.15);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 50px;
+      font-weight: bold;
+      font-size: 0.9rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .reward-pill {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      color: #ffc409;
+    }
   }
 
-  video {
-    border-radius: 12px;
+  ion-progress-bar {
+    height: 4px;
+    border-radius: 2px;
     margin-bottom: 15px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    --background: rgba(255,255,255,0.2);
   }
 
-  .collect-btn {
-    margin-top: 10px;
-    font-weight: 600;
-    --border-radius: 12px;
+  .claim-btn {
     height: 50px;
-  }
-
-  /* Custom loading style */
-  .custom-loading {
-    --spinner-color: #ffffff;
-    --background: #0066ff;
-    color: white;
-    font-weight: bold;
-  }
-
-  /* Reward toast styling */
-  .reward-toast {
-    font-size: 1.1rem;
-    font-weight: 600;
-    text-align: center;
+    margin: 0;
+    --border-radius: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
   }
 }

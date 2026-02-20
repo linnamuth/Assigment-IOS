@@ -41,7 +41,7 @@ export class HistoryPage {
 
   loadData() {
     // UPDATED: Now reading from sessionStorage
-    const userData = sessionStorage.getItem('user');
+    const userData = sessionStorage.getItem('active_user');
 
     if (userData) {
       const user = JSON.parse(userData);

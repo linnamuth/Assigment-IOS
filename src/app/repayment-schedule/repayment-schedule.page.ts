@@ -49,7 +49,7 @@ export class RepaymentSchedulePage implements OnInit {
 
 
  loadLoanData() {
-  const sessionData = sessionStorage.getItem('user');
+  const sessionData = sessionStorage.getItem('active_user');
   const currentUser = JSON.parse(sessionData || '{}');
 
   if (!currentUser) {

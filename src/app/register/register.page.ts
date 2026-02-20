@@ -1,7 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../services/auth.service';
-import { Haptics, ImpactStyle } from '@capacitor/haptics';
 import { IonicModule, ToastController, LoadingController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -13,7 +12,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [CommonModule, FormsModule, IonicModule]
 })
-export class RegisterPage {
+export class RegisterPage implements OnInit {
   username: string = '';
   email: string = '';
   password: string = '';
@@ -25,9 +24,10 @@ export class RegisterPage {
     private toastCtrl: ToastController,
     private loadingCtrl: LoadingController
   ) {}
+ngOnInit(): void {
+}
 
-  async onRegister() {
-
+async onRegister() {
   const loading = await this.loadingCtrl.create({
     message: 'Creating account...',
     mode: 'ios'
@@ -39,55 +39,51 @@ export class RegisterPage {
       id: Date.now(),
       username: this.username.trim(),
       email: this.email.toLowerCase().trim(),
-      password: this.password, // plain text for testing, but ideally hashed
-      joinedDate: new Date().toISOString(),
-      balance: 0,
-      completedVideoIds: [],
-      loanHistory: []
+      password: this.password,
+      joinedDate: new Date().toISOString()
     };
 
-    // 1. USE LOCALSTORAGE for the 'Database' (all_users_list)
-    // This ensures the account exists even if the tab is closed/hosted
-    const storedUsers = localStorage.getItem('all_users_list');
+    // Get existing users from sessionStorage
+    const storedUsers = sessionStorage.getItem('all_users_list');
     let usersArray = storedUsers ? JSON.parse(storedUsers) : [];
 
+    // Check if email already exists
     const userExists = usersArray.some((u: any) => u.email === newUser.email);
     if (userExists) {
       await loading.dismiss();
-      this.presentToast('Email already registered', 'danger');
+      await this.presentToast('Email already registered', 'danger');
       return;
     }
 
-    // Save to the "Permanent" list
+    // Save new user in sessionStorage
     usersArray.push(newUser);
-    localStorage.setItem('all_users_list', JSON.stringify(usersArray));
+    sessionStorage.setItem('all_users_list', JSON.stringify(usersArray));
 
-    // 2. USE SESSIONSTORAGE for the Active User only
-    // This tells the app "this person is logged in right now"
-    sessionStorage.setItem('user', JSON.stringify(newUser));
-
-    this.auth.register(newUser);
+    // ✅ Also store active user so app knows they are logged in
+    sessionStorage.setItem('active_user', JSON.stringify(newUser));
 
     await loading.dismiss();
+    await this.presentToast('Account created successfully!', 'success');
+
+    // Redirect to home page directly
     this.router.navigate(['/tabs/home'], { replaceUrl: true });
-    this.presentToast('Account created successfully!', 'success');
 
   } catch (error) {
     await loading.dismiss();
-    this.presentToast('Storage error. Check browser settings.', 'danger');
+    await this.presentToast('Storage error. Check browser settings.', 'danger');
   }
 }
 
   async presentToast(message: string, color: string = 'dark') {
-    const toast = await this.toastCtrl.create({
-      message,
-      duration: 2500,
-      position: 'bottom',
-      mode: 'ios',
-      color: color
-    });
-    await toast.present();
-  }
+  const toast = await this.toastCtrl.create({
+    message,
+    duration: 2500,
+    position: 'bottom',
+    mode: 'ios',
+    color
+  });
+  await toast.present();
+}
 
   goToLogin() {
     this.router.navigate(['/login']);
