@@ -21,7 +21,7 @@ import {
   IonButton
 } from '@ionic/angular/standalone';
 import { AuthService } from '../services/auth.service';
-
+import { CapacitorHttp } from '@capacitor/core';
 interface DocumentItem {
   id: number;
   title: string;
@@ -124,32 +124,30 @@ commune: string = '';
   }
 
   loadLoanFromSession() {
-    const sessionData = sessionStorage.getItem('user');
+  const sessionData = sessionStorage.getItem('active_user');
 
-    if (sessionData) {
-      const user = JSON.parse(sessionData);
-      if (user.currentLoan) {
-        const loan = user.currentLoan;
+  if (sessionData) {
+    const user = JSON.parse(sessionData);
+    console.log('Active user loaded:', user);
 
-        this.loanAmount = loan.amount || 0;
-        this.interestRate = loan.interest || 0;
-        this.durationMonths = loan.duration || 12;
-        this.collateral = loan.collateral || '';
-        this.includeExtraFees = loan.includeExtraFees || false;
+    // Set default personal info
+    this.firstName = user.username || '';
+    this.email = user.email || '';
 
-        console.log('Loan data loaded from session:', loan);
-      } else {
-        console.warn('No active loan calculation found in session.');
-      }
-
-      if (!this.firstName) this.firstName = user.username || '';
-      if (!this.email) this.email = user.email || '';
-
-    } else {
-      console.error('Session lost. Redirecting...');
-      this.router.navigate(['/tabs/home']);
+    // Load current loan if exists
+    if (user.currentLoan) {
+      const loan = user.currentLoan;
+      this.loanAmount = loan.amount || 0;
+      this.interestRate = loan.interest || 0;
+      this.durationMonths = loan.duration || 12;
+      this.collateral = loan.collateral || '';
+      this.includeExtraFees = loan.includeExtraFees || false;
     }
+  } else {
+    console.warn('No active user found. Redirecting...');
+    this.router.navigate(['/tabs/home']);
   }
+}
 
 
   chooseFile(docId: number) {
@@ -168,62 +166,69 @@ commune: string = '';
   editLoan() {
     this.router.navigate(['/tabs/home']);
   }
-  async submitApplication() {
-    // Basic Validation
+ async submitApplication() {
+  const loading = await this.loadingCtrl.create({
+    message: 'Submitting Application...',
+    spinner: 'circles',
+    mode: 'ios'
+  });
+  await loading.present();
 
+  try {
+    // 1. Consistency: Use the same key you used in loadLoanFromSession
+    const userData = sessionStorage.getItem('active_user');
 
-    const loading = await this.loadingCtrl.create({
-      message: 'Submitting to Session...',
-      spinner: 'circles',
+    if (!userData) {
+      throw new Error("No User Session Found");
+    }
+
+    const currentUser = JSON.parse(userData);
+
+    // 2. Create the application object
+    const applicationData = {
+      applicationId: '#LN-' + Math.floor(Math.random() * 1000000),
+      status: 'Under Review',
+      personalInfo: {
+        email: this.email,
+        // Make sure these variables aren't empty
+        address: `${this.currentAddress || ''} ${this.commune || ''}, ${this.district || ''}, ${this.province || ''}`.trim()
+      },
+      loanDetails: currentUser.currentLoan || {},
+      submissionDate: new Date().toISOString(),
+      reviewTime: '24–48 Hours'
+    };
+
+    // 3. Update the objects
+    currentUser.currentApplication = applicationData;
+
+    // 4. Save back to session storage
+    sessionStorage.setItem('active_user', JSON.stringify(currentUser));
+    sessionStorage.setItem('currentApplication', JSON.stringify(applicationData));
+
+    // 5. Update the master list if it exists
+    const allUsers = JSON.parse(sessionStorage.getItem('all_users_list') || '[]');
+    const idx = allUsers.findIndex((u: any) => u.email === currentUser.email);
+    if (idx !== -1) {
+      allUsers[idx] = currentUser;
+      sessionStorage.setItem('all_users_list', JSON.stringify(allUsers));
+    }
+
+    await loading.dismiss();
+    this.router.navigate(['/tabs/application-status']);
+
+  } catch (error) {
+    await loading.dismiss();
+    console.error("Submission Error Details:", error); // See the real error in console
+
+    const errorAlert = await this.alertCtrl.create({
+      header: 'Submission Error',
+      message: 'Your session has expired or is invalid. Please log in again.',
+      buttons: ['OK'],
       mode: 'ios'
     });
-    await loading.present();
-
-    try {
-      const userData = sessionStorage.getItem('user');
-      if (!userData) throw new Error("No User Session");
-
-      const currentUser = JSON.parse(userData);
-      const applicationData = {
-        applicationId: '#LN-' + Math.floor(Math.random() * 1000000),
-        status: 'Under Review',
-        personalInfo: {
-          email: this.email,
-          address: `${this.currentAddress}, ${this.commune}, ${this.district}, ${this.province}`
-        },
-        loanDetails: currentUser.currentLoan, // Inherit from the calculation
-        submissionDate: new Date().toISOString(),
-        reviewTime: '24–48 Hours'
-      };
-
-      currentUser.currentApplication = applicationData;
-
-      sessionStorage.setItem('user', JSON.stringify(currentUser));
-      sessionStorage.setItem('currentApplication', JSON.stringify(applicationData));
-
-      const allUsers = JSON.parse(sessionStorage.getItem('all_users_list') || '[]');
-      const idx = allUsers.findIndex((u: any) => u.email === currentUser.email);
-      if (idx !== -1) {
-        allUsers[idx] = currentUser;
-        sessionStorage.setItem('all_users_list', JSON.stringify(allUsers));
-      }
-
-      await loading.dismiss();
-
-      // Navigate to status page
-      this.router.navigate(['/tabs/application-status']);
-
-    } catch (error) {
-      await loading.dismiss();
-      const errorAlert = await this.alertCtrl.create({
-        header: 'Submission Error',
-        message: 'Session lost. Please log in again.',
-        buttons: ['OK'],
-        mode: 'ios'
-      });
-      await errorAlert.present();
-    }
+    await errorAlert.present();
   }
+}
 
 
  saveLoanData() {
@@ -247,39 +252,42 @@ commune: string = '';
 }
  async getCurrentCoordinates() {
     try {
-      // 1️⃣ Get device coordinates
       const coordinates = await Geolocation.getCurrentPosition();
-      const lat = coordinates.coords.latitude;
-      const lng = coordinates.coords.longitude;
-
-      // 2️⃣ Use lat/lng to get human-readable address
-      await this.getAddressFromCoordinates(lat, lng);
-
+      await this.getAddressFromCoordinates(coordinates.coords.latitude, coordinates.coords.longitude);
     } catch (err) {
-      console.error('Error getting location', err);
-      this.currentAddress = 'Location unavailable';
+      console.error('Location error', err);
+      this.currentAddress = 'Manual entry required';
     }
   }
 
- async getAddressFromCoordinates(lat: number, lng: number) {
-  const response = await fetch(
-    `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`
-  );
+async getAddressFromCoordinates(lat: number, lng: number) {
+  try {
+    const options = {
+      url: `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}`,
+      headers: { 'User-Agent': 'MyIonicApp/1.0' }
+    };
 
-  const data = await response.json();
+    // This uses Native power to skip CORS entirely
+    const response = await CapacitorHttp.get(options);
+    const data = response.data;
 
-  // Assign to each input separately
-  this.province = data.address.state || '';
-  this.district =
-    data.address.city ||
-    data.address.town ||
-    data.address.county ||
-    '';
-
-  this.commune =
-    data.address.suburb ||
-    data.address.village ||
-    '';
+    if (data && data.address) {
+      this.province = data.address.state || data.address.province || '';
+      this.district = data.address.city || data.address.town || '';
+      this.commune = data.address.suburb || data.address.village || '';
+      this.currentAddress = data.display_name || '';
+    }
+  } catch (error) {
+    console.error('Even Native fetch failed:', error);
+    this.setDefaultAddress(); // Fallback
+  }
+}
+setDefaultAddress() {
+  // Set these to your most common location or leave empty strings
+  this.province = 'Phnom Penh';
+  this.district = 'Chamkar Mon';
+  this.commune = 'Tonle Bassac';
+  this.currentAddress = 'Phnom Penh, Cambodia';
 }
 
 }

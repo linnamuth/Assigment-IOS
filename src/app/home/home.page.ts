@@ -198,7 +198,7 @@ export class HomePage implements OnInit {
     };
 
     // Use sessionStorage
-    const activeUserJson = sessionStorage.getItem('user');
+    const activeUserJson = sessionStorage.getItem('active_user');
 
     if (activeUserJson) {
       const currentUser = JSON.parse(activeUserJson);
@@ -208,7 +208,7 @@ export class HomePage implements OnInit {
       currentUser.loanHistory.unshift(loanData);
 
       // Update current user session
-      sessionStorage.setItem('user', JSON.stringify(currentUser));
+      sessionStorage.setItem('active_user', JSON.stringify(currentUser));
 
       // Sync with global session user list
       const allUsersJson = sessionStorage.getItem('all_users_list');
