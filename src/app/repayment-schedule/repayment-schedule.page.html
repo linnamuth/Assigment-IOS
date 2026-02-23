@@ -32,26 +32,35 @@
       <p class="instruction">Tap a month to toggle payment status</p>
 
       <div class="month-grid">
-        <div *ngFor="let month of months; let i = index" class="month-card" [class.is-paid]="month.paid"
-          (click)="togglePayment(month, i)">
+  <div *ngFor="let month of months; let i = index"
+       class="month-card"
+       [class.is-paid]="month.paid"
+       (click)="togglePayment(month, i)">
 
-          <div class="month-info">
-            <div class="month-circle">
-              <span *ngIf="!month.paid">{{ month.number }}</span>
-              <ion-icon *ngIf="month.paid" [icon]="checkmarkCircle"></ion-icon>
-            </div>
-            <div class="month-text">
-              <span class="name">{{ month.name }}</span>
-              <span class="status-label">{{ month.paid ? 'Payment Received' : 'Pending' }}</span>
-            </div>
-          </div>
-
-          <div class="month-amount-box">
-            <span class="amount">{{ month.amount }}</span>
-            <div class="status-dot" [class.active]="month.paid"></div>
-          </div>
-        </div>
+    <div class="month-info">
+      <div class="month-circle">
+        <span *ngIf="!month.paid">{{ month.number }}</span>
+        <ion-icon *ngIf="month.paid" [icon]="checkmarkCircle"></ion-icon>
       </div>
+
+      <div class="month-text">
+        <span class="name">{{ month.name }}</span>
+
+        <span class="full-date-text">{{ month.fullDate }}</span>
+
+        <span class="status-label" [style.color]="month.paid ? '#38a169' : '#718096'">
+          {{ month.paid ? 'Payment Received' : 'Pending' }}
+        </span>
+      </div>
+    </div>
+
+    <div class="month-amount-box">
+      <span class="amount">{{ month.amount }}</span>
+      <div class="status-dot" [class.active]="month.paid"></div>
+    </div>
+
+  </div>
+</div>
     </div>
 
     <div class="summary-cards">

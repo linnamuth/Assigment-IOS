@@ -168,21 +168,29 @@
     }
 
     .month-text {
-      display: flex;
-      flex-direction: column;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
 
-      .name {
-        font-weight: 700;
-        color: #2c3e50;
-        font-size: 15px;
-      }
-      .status-label {
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-        color: #95a5a6;
-      }
-    }
+  .name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #2d3436;
+  }
+
+  .full-date-text {
+    font-size: 0.85rem;
+    color: #4a5568; // Slightly darker grey for readability
+    margin: 2px 0;
+  }
+
+  .status-label {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+}
   }
 
   .month-amount-box {

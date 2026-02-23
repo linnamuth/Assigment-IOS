@@ -167,7 +167,7 @@ export class RepaymentSchedulePage implements OnInit {
     this.months.forEach(m => { if (m.paid) m.locked = true; });
 
     // UPDATED: Saving to sessionStorage
-    const userData = sessionStorage.getItem('user');
+    const userData = sessionStorage.getItem('active_user');
     if (userData) {
       const user = JSON.parse(userData);
       user.repaymentSchedule = [...this.months];
@@ -187,7 +187,7 @@ export class RepaymentSchedulePage implements OnInit {
       }
 
       // SAVE BACK TO SESSION
-      sessionStorage.setItem('user', JSON.stringify(user));
+      sessionStorage.setItem('active_user', JSON.stringify(user));
     }
 
     await loading.dismiss();

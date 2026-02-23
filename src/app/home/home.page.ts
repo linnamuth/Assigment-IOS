@@ -12,7 +12,7 @@ import {
 import { addIcons } from 'ionicons';
 import { calculatorOutline, helpCircleOutline, settingsOutline, timeOutline } from 'ionicons/icons';
 import { LoadingController, AlertController } from '@ionic/angular';
-
+import { ToastController } from '@ionic/angular';
 interface Calculation {
   title: string;
   duration: string;
@@ -52,13 +52,15 @@ export class HomePage implements OnInit {
   private readonly EXTRA_FEE = 25;
   private readonly CURRENCY_FORMAT = 'en-US';
   private _hasActiveLoan: boolean = false;
+
   rateLabel: string = '';
 
   constructor(
     private router: Router,
     private loadingCtrl: LoadingController,
     private alertCtrl: AlertController,
-    private auth: AuthService
+    private auth: AuthService,
+    private toastCtrl: ToastController,
   ) {
     addIcons({
       'help-circle-outline': helpCircleOutline,
@@ -171,65 +173,85 @@ export class HomePage implements OnInit {
     sessionStorage.setItem('loan_history', JSON.stringify(history));
   }
 
-  async applyNow() {
-    if (!this.isValidInput()) return;
+ async applyNow() {
+  // 1. Basic validation
+  if (!this.isValidInput()) return;
 
-    if (this.hasActiveLoan) {
-      this.showBlockedAlert();
-      return;
-    }
+  // 2. Fetch User Data
+  const activeUserJson = sessionStorage.getItem('active_user');
+  if (!activeUserJson) {
+    this.presentToast('Please log in to apply.', 'danger');
+    return;
+  }
+  const currentUser = JSON.parse(activeUserJson);
 
-    const loading = await this.loadingCtrl.create({
-      message: 'Processing Application...',
-      spinner: 'circles',
-      mode: 'ios'
-    });
-    await loading.present();
+  // 3. CHECK FOR ACTIVE LOANS
+  // We check if any loan in history is NOT 'Completed'
+  const hasUnpaidLoan = currentUser.loanHistory?.some((loan: any) =>
+    loan.status !== 'Completed'
+  );
 
-    const loanData = {
-      amount: this.loanAmount,
-      interest: this.interestRate,
-      duration: this.durationMonths,
-      monthlyPayment: this.monthlyPayment,
-      totalPayback: this.totalPayback,
-      status: 'Pending Documents',
-      date: new Date().toISOString(),
-      id: 'LOAN-' + Math.random().toString(36).substr(2, 9).toUpperCase()
-    };
-
-    // Use sessionStorage
-    const activeUserJson = sessionStorage.getItem('active_user');
-
-    if (activeUserJson) {
-      const currentUser = JSON.parse(activeUserJson);
-      currentUser.currentLoan = loanData;
-
-      if (!currentUser.loanHistory) currentUser.loanHistory = [];
-      currentUser.loanHistory.unshift(loanData);
-
-      // Update current user session
-      sessionStorage.setItem('active_user', JSON.stringify(currentUser));
-
-      // Sync with global session user list
-      const allUsersJson = sessionStorage.getItem('all_users_list');
-      if (allUsersJson) {
-        let users = JSON.parse(allUsersJson);
-        const index = users.findIndex((u: any) => u.username === currentUser.username);
-        if (index !== -1) {
-          users[index] = currentUser;
-          sessionStorage.setItem('all_users_list', JSON.stringify(users));
-        }
-      }
-
-      this.auth.setUser(currentUser);
-    }
-
-    setTimeout(async () => {
-      await loading.dismiss();
-      this.router.navigate(['/tabs/upload-document']);
-    }, 1500);
+  // If they have an unpaid loan, block them
+  if (hasUnpaidLoan || currentUser.currentLoan) {
+    this.showBlockedAlert();
+    return;
   }
 
+  // 4. Proceed with application if clear
+  const loading = await this.loadingCtrl.create({
+    message: 'Processing Application...',
+    spinner: 'circles',
+    mode: 'ios'
+  });
+  await loading.present();
+
+  const loanData = {
+    amount: this.loanAmount,
+    interest: this.interestRate,
+    duration: this.durationMonths,
+    monthlyPayment: this.monthlyPayment,
+    totalPayback: this.totalPayback,
+    status: 'Pending Documents', // Initial status
+    date: new Date().toISOString(),
+    id: 'LOAN-' + Math.random().toString(36).substr(2, 9).toUpperCase()
+  };
+
+  // 5. Save Data
+  currentUser.currentLoan = loanData;
+  if (!currentUser.loanHistory) currentUser.loanHistory = [];
+  currentUser.loanHistory.unshift(loanData);
+
+  // Update current user session
+  sessionStorage.setItem('active_user', JSON.stringify(currentUser));
+
+  // Sync with global session user list
+  const allUsersJson = sessionStorage.getItem('all_users_list');
+  if (allUsersJson) {
+    let users = JSON.parse(allUsersJson);
+    const index = users.findIndex((u: any) => u.username === currentUser.username);
+    if (index !== -1) {
+      users[index] = currentUser;
+      sessionStorage.setItem('all_users_list', JSON.stringify(users));
+    }
+  }
+
+  this.auth.setUser(currentUser);
+
+  setTimeout(async () => {
+    await loading.dismiss();
+    this.router.navigate(['/tabs/upload-document']);
+  }, 1500);
+}
+async presentToast(message: string, color: string = 'dark') {
+    const toast = await this.toastCtrl.create({
+      message: message,
+      duration: 2000,
+      color: color,
+      mode: 'ios',
+      position: 'bottom'
+    });
+    await toast.present();
+  }
   async showBlockedAlert() {
     const alert = await this.alertCtrl.create({
       header: 'Action Restricted',
