@@ -89,14 +89,25 @@ export class VideoModalComponent implements OnInit, OnDestroy, AfterViewInit {
     if (this.intervalId) return;
     this.intervalId = setInterval(() => {
       this.zone.run(() => {
-        if (!this.player || !this.player.getCurrentTime) return;
+        if (!this.player || !this.player.getCurrentTime || !this.player.getDuration) return;
+
         const currentTime = this.player.getCurrentTime();
+        const videoDuration = this.player.getDuration();
+
+        const actualGoal = Math.min(this.requiredSeconds, videoDuration);
 
         if (!this.rewardClaimed) {
-          this.watchProgress = Math.min(currentTime / this.requiredSeconds, 1);
-          const remaining = Math.max(this.requiredSeconds - currentTime, 0);
+          // Update progress bar based on the actual goal
+          this.watchProgress = Math.min(currentTime / actualGoal, 1);
+
+          const remaining = Math.max(actualGoal - currentTime, 0);
           this.updateTimerDisplay(remaining);
-          if (currentTime >= this.requiredSeconds) this.canCollect = true;
+
+          if (currentTime >= actualGoal || currentTime >= (videoDuration - 0.5)) {
+            this.canCollect = true;
+            this.watchProgress = 1;
+            this.displayTime = '0:00';
+          }
         }
       });
     }, 500);
@@ -138,7 +149,6 @@ async collectReward() {
   }, 1000);
 }
 
-// Update your close function to handle cases where they don't claim
 close() {
   this.modalCtrl.dismiss({ success: false });
 }

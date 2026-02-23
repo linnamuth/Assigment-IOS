@@ -3,8 +3,7 @@
   <div class="search-row">
     <div class="search-box">
       <ion-icon name="search-outline"></ion-icon>
-      <input type="text" placeholder="Search amount or duration..."
-             [(ngModel)]="searchText" (input)="applyFilters()">
+      <input type="text" placeholder="Search amount or term..." [(ngModel)]="searchText" (input)="applyFilters()">
     </div>
   </div>
 
@@ -20,15 +19,15 @@
 
       <div *ngFor="let item of group.items" class="loan-card" (click)="openDetail(item)">
         <div class="card-info">
-          <span class="amount">{{ formatCurrency(item.amount) }}</span>
+          <span class="amount">{{ formatCurrency(item.monthly) }} <small class="per-mo">/mo</small></span>
           <div class="details">
-            <span>{{ item.duration }} Mo</span>
+            <span>{{ item.duration }} Months</span>
             <span class="dot"></span>
-            <span>{{ item.interestRate }}% Rate</span>
+            <span>Total: {{ formatCurrency(item.amount) }}</span>
           </div>
         </div>
         <div class="card-right">
-          <span class="time">{{ item.time }}</span>
+          <span class="status-dot" [class.active]="item.status !== 'Completed'"></span>
           <ion-icon name="chevron-forward-outline"></ion-icon>
         </div>
       </div>
@@ -38,7 +37,7 @@
   <ng-template #emptyState>
     <div class="empty-state">
       <ion-icon name="alert-circle-outline"></ion-icon>
-      <p>No results found</p>
+      <p>No records found</p>
     </div>
   </ng-template>
 
